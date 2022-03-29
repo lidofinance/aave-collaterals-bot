@@ -1,0 +1,3 @@
+[submodule "alertmanager-discord"]
+	path = alertmanager-discord
+	url = https://github.com/lidofinance/alertmanager-discord.git

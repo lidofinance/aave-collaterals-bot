@@ -1,0 +1,22 @@
+---
+groups:
+  - name: aaveBot
+    rules:
+
+      - alert: HighAmountCollateralsUnderRisk
+        expr: sum(aave_bot_collateral_percentage{zone=~"C|D|liquidation", bin="2"}) > 15.0
+        for: 30m
+        labels:
+          severity: high
+        annotations:
+          summary: High percent of AAVE collaterals in dangerous zone 🔥
+          description: It is {{ $value | printf "%.1f" }}% of AAVE collaterals within high risk of liquidation!
+
+      - alert: AAVECollateralsLiquidation
+        expr: aave_bot_collateral_percentage{zone="liquidation", bin="2"} > 0
+        labels:
+          severity: high
+        annotations:
+          summary: AAVE collaterals under liquidation has been detected!
+
+# vim: set ts=2 sw=2 ft=yaml:
