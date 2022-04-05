@@ -7,7 +7,6 @@ services:
     command: "main.py"
     environment:
       INFURA_ENDPOINT:
-      ETHERSCAN_KEY:
       FLIPSIDE_ENDPOINT:
       EXPORTER_PORT:
     restart: unless-stopped
