@@ -4,7 +4,7 @@ groups:
     rules:
 
       - alert: TooLowUpdates
-        expr: changes(aave_bot_collateral_percentage{zone=~"C|D"}[1h]) < 5
+        expr: changes(aave_bot_collateral_percentage{zone=~"C|D"}[1h]) < 6
         for: 30m
         labels:
           stage: testing

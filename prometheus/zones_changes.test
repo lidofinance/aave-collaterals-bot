@@ -1,0 +1,76 @@
+---
+rule_files: 
+  - "zones_changes.rule"
+evaluation_interval: 1m
+tests:
+  # HighAmountCollateralsUnderRisk
+  - interval: 5m 
+    input_series:
+      - series: aave_bot_collateral_percentage{zone="D", bin="1"}
+        values: 20+0x10
+      - series: aave_bot_collateral_percentage{zone="D", bin="2"}
+        values: 17+0x10
+      - series: aave_bot_collateral_percentage{zone="D", bin="3"}
+        values: 10+0x10
+    alert_rule_test:
+      # no fire
+      - eval_time: 5m
+        alertname: HighAmountCollateralsUnderRisk
+
+      - eval_time: 30m
+        alertname: HighAmountCollateralsUnderRisk
+        exp_alerts:
+          # Bin 1
+          - exp_labels:
+              severity: high
+              bin: 1
+            exp_annotations:
+              summary: High percent of AAVE bin 1 collaterals in dangerous zone 🔥
+              description: >-
+                > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
+
+                It is 20.0% of bin 1 within high risk of liquidation!
+          # Bin 2
+          - exp_labels:
+              severity: high
+              bin: 2
+            exp_annotations:
+              summary: High percent of AAVE bin 2 collaterals in dangerous zone 🔥
+              description: >-
+                > AAVE users with stETH collateral and >=80% debt not in ETH
+
+                It is 17.0% of bin 2 within high risk of liquidation!
+
+  # AAVECollateralsLiquidation
+  - interval: 5m 
+    input_series:
+      - series: aave_bot_collateral_percentage{zone="liquidation", bin="1"}
+        values: 0.01+0x10
+      - series: aave_bot_collateral_percentage{zone="liquidation", bin="2"}
+        values: 0.01+0x10
+      - series: aave_bot_collateral_percentage{zone="liquidation", bin="3"}
+        values: 0+0x10
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: AAVECollateralsLiquidation 
+        exp_alerts:
+          # Bin 1
+          - exp_labels:
+              severity: high
+              zone: liquidation
+              bin: 1
+            exp_annotations:
+              summary: AAVE bin 1 collaterals under liquidation has been detected!
+              description: >-
+                > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
+          # Bin 2
+          - exp_labels:
+              severity: high
+              zone: liquidation
+              bin: 2
+            exp_annotations:
+              summary: AAVE bin 2 collaterals under liquidation has been detected!
+              description: >-
+                > AAVE users with stETH collateral and >=80% debt not in ETH
+
+# vim: set ts=2 sw=2 ft=yaml:

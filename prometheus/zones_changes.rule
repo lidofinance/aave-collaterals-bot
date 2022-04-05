@@ -4,19 +4,41 @@ groups:
     rules:
 
       - alert: HighAmountCollateralsUnderRisk
-        expr: sum(aave_bot_collateral_percentage{zone=~"C|D|liquidation", bin="2"}) > 15.0
+        expr: sum (aave_bot_collateral_percentage{zone=~"C|D|liquidation"}) by (bin) > 15.0
         for: 30m
         labels:
           severity: high
         annotations:
-          summary: High percent of AAVE collaterals in dangerous zone 🔥
-          description: It is {{ $value | printf "%.1f" }}% of AAVE collaterals within high risk of liquidation!
+          summary: High percent of AAVE bin {{ .Labels.bin }} collaterals in dangerous zone 🔥
+          description: >-
+            {{- if eq .Labels.bin "1" -}}
+            > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
+            {{- end -}}
+            {{- if eq .Labels.bin "2" -}}
+            > AAVE users with stETH collateral and >=80% debt not in ETH
+            {{- end -}}
+            {{- if eq .Labels.bin "3" -}}
+            > AAVE users with less significant stETH collateral amount
+            {{- end }}
+
+            It is {{ $value | printf "%.1f" }}% of bin {{ .Labels.bin }} within high risk of liquidation!
+
 
       - alert: AAVECollateralsLiquidation
-        expr: aave_bot_collateral_percentage{zone="liquidation", bin="2"} > 0
+        expr: aave_bot_collateral_percentage{zone="liquidation"} > 0
         labels:
           severity: high
         annotations:
-          summary: AAVE collaterals under liquidation has been detected!
+          summary: AAVE bin {{ .Labels.bin }} collaterals under liquidation has been detected!
+          description: >-
+            {{- if eq .Labels.bin "1" -}}
+            > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
+            {{- end -}}
+            {{- if eq .Labels.bin "2" -}}
+            > AAVE users with stETH collateral and >=80% debt not in ETH
+            {{- end -}}
+            {{- if eq .Labels.bin "3" -}}
+            > AAVE users with less significant stETH collateral amount
+            {{- end }}
 
 # vim: set ts=2 sw=2 ft=yaml:
