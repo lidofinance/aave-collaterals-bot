@@ -37,8 +37,6 @@ if "wss://" in INFURA_ENDPOINT:
     # doesn't work in the current flow. Magic asyncio fails happen.
     raise RuntimeError("Only http[s] Web3 provider endpoint supported")
 
-ETHERSCAN_KEY = getenv("ETHERSCAN_KEY", required=True)
-
 # === Optional ===
 
 FLIPSIDE_ENDPOINT = getenv(
