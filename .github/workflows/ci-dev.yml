@@ -1,10 +1,10 @@
-name: CI staging
+name: CI dev
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - develop
     paths-ignore:
       - '.github/**'
 
@@ -18,10 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Staging deploying
+      - name: Testnet deploy
         run: .github/dispatch_workflow.py
         env:
           APP_ID: ${{ secrets.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
           TARGET_REPO: "${{ secrets.TARGET_REPO }}"
-          TARGET_WORKFLOW: "deploy_staging_mainnet_aave_collaterals_bot.yml"
+          TARGET_WORKFLOW: "deploy_testnet_aave_collaterals_bot.yaml"
