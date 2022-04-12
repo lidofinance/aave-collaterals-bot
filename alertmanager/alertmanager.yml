@@ -1,9 +1,9 @@
 route:
 
-  group_by: ['alertname']
+  group_by: ['alertname', 'bin']
   group_wait: 30s
   group_interval: 6h
-  repeat_interval: 12h
+  repeat_interval: 11h
   receiver: 'discord'
 
 receivers:

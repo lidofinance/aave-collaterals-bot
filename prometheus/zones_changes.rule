@@ -21,7 +21,7 @@ groups:
             > AAVE users with less significant stETH collateral amount
             {{- end }}
 
-            It is {{ $value | printf "%.1f" }}% of bin {{ .Labels.bin }} within high risk of liquidation!
+            It is {{ $value | printf "%.1f" }}% of bin {{ .Labels.bin }} in risky zone!
 
 
       - alert: AAVECollateralsLiquidation
