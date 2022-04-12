@@ -29,7 +29,7 @@ tests:
               description: >-
                 > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
 
-                It is 20.0% of bin 1 within high risk of liquidation!
+                It is 20.0% of bin 1 in risky zone!
           # Bin 2
           - exp_labels:
               severity: high
@@ -39,7 +39,7 @@ tests:
               description: >-
                 > AAVE users with stETH collateral and >=80% debt not in ETH
 
-                It is 17.0% of bin 2 within high risk of liquidation!
+                It is 17.0% of bin 2 in risky zone!
 
   # AAVECollateralsLiquidation
   - interval: 5m 
