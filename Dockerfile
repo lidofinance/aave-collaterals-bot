@@ -32,8 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 RUN curl -sSL https://install.python-poetry.org | python -
 
 COPY ./pyproject.toml ./poetry.lock ./
-RUN poetry install --no-dev && \
-    rm -rf "$VENV_PATH/lib/*/site-packages/{pip*,setuptools*}"
+RUN poetry install --no-dev
 
 
 FROM base as prod
