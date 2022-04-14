@@ -1,4 +1,5 @@
 """Workaround to reduce calls count to ETH node"""
+# pylint: disable=unused-argument,invalid-name,unused-import
 
 import logging
 from typing import Any, Callable
@@ -6,11 +7,10 @@ from typing import Any, Callable
 from web3 import Web3
 from web3.types import Middleware, RPCEndpoint, RPCResponse
 
-
 log = logging.getLogger(__name__)
 
 
-def construct_mock_chainId_middleware() -> Middleware:
+def construct_mock_chain_id_middleware() -> Middleware:
     """Constructs a middleware which mock eth_chainId method call response"""
 
     def wrapper(
@@ -31,7 +31,7 @@ def construct_mock_chainId_middleware() -> Middleware:
     return wrapper
 
 
-requests_cache = construct_mock_chainId_middleware()
+requests_cache = construct_mock_chain_id_middleware()
 
 # The following code should be used, by I cannot make it works at the moment :(
 

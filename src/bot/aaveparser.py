@@ -7,8 +7,8 @@ import pandas as pd
 import requests
 from unsync import unsync
 
-from config import FLIPSIDE_ENDPOINT
-from eth import AAVE_LPOOL, AAVE_ORACLE, ASTETH, w3
+from .config import FLIPSIDE_ENDPOINT
+from .eth import AAVE_LPOOL, AAVE_ORACLE, ASTETH, w3
 
 LIDO_STETH = w3.toChecksumAddress("0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
 
@@ -35,9 +35,13 @@ class CoinGeckoPriceRequestParams:
 def _crypto_to_usd(currency: str) -> float:
 
     payload = CoinGeckoPriceRequestParams(ids=currency)
-    r = requests.get("https://api.coingecko.com/api/v3/simple/price", params=asdict(payload), timeout=5)
-    r.raise_for_status()
-    return r.json()[currency]["usd"]
+    response = requests.get(
+        "https://api.coingecko.com/api/v3/simple/price",
+        params=asdict(payload),
+        timeout=5,
+    )
+    response.raise_for_status()
+    return response.json()[currency]["usd"]
 
 
 def eth_last_price() -> float:
@@ -85,9 +89,9 @@ def get_userlist() -> Iterable:
     """Get the list of borrowers.
     NB! It's subject to change!"""
 
-    r = requests.get(FLIPSIDE_ENDPOINT, timeout=15)
-    r.raise_for_status()
-    return r.json()
+    response = requests.get(FLIPSIDE_ENDPOINT, timeout=15)
+    response.raise_for_status()
+    return response.json()
 
 
 def parse() -> pd.DataFrame:
@@ -128,7 +132,7 @@ def parse() -> pd.DataFrame:
         return buf
 
     tasks = [_parse_stats(), _parse_balance()]
-    parts = [pd.DataFrame(task.result()) for task in tasks]  # type: ignore
+    parts = [pd.DataFrame(task.result()) for task in tasks]  # type: ignore # pylint: disable=no-member
 
     for part in parts:
         df = df.merge(part, on="user", how="left")

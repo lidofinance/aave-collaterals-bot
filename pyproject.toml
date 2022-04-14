@@ -16,3 +16,29 @@ urllib3 = "^1.26.9"
 pandas = "^1.4.1"
 unsync = "^1.4.0"
 numpy = "^1.22.3"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+pylint = "^2.13.5"
+isort = "^5.10.1"
+
+[tool.pylint.format]
+max-line-length = 120
+max-module-lines = 1000
+good-names = "i,j,df,ex"
+
+[tool.black]
+line-length = 120
+target-version = ['py310']
+include = '\.py$'
+exclude = '''
+(
+      \.git
+    | \.venv
+    | /__pycache__/
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120

@@ -1,16 +1,16 @@
 """ETH Web3 connection"""
 
-from functools import cache
 import json
 import logging
 import os
+from functools import cache
 from pathlib import Path
 
 from web3 import HTTPProvider, Web3
 from web3.contract import Contract
 
-from config import INFURA_ENDPOINT
-from middleware import requests_cache
+from .config import INFURA_ENDPOINT
+from .middleware import requests_cache
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ w3.middleware_onion.add(requests_cache, "requests_cache")
 @cache
 def _contract(address: str, abi_file: os.PathLike) -> Contract:
     """Get Contract instance by the given address"""
-    
+
     address = w3.toChecksumAddress(address)
     with open(abi_file, mode="r", encoding="utf-8") as file:
         abi = json.load(file)
