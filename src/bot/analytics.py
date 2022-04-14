@@ -29,9 +29,7 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df.fillna(0, inplace=True)
     df = pd.DataFrame(data=df.query("collateral > 0 and debt > 0"))
     steth_price = get_steth_eth_price() / pow(10, DECIMALS_STETH)
-    df["diff_collateral"] = (
-        abs(df["collateral"] - df["amount"] * steth_price) / df["collateral"]
-    )
+    df["diff_collateral"] = abs(df["collateral"] - df["amount"] * steth_price) / df["collateral"]
     df["diff_debt"] = abs(df["ethdebt"] - df["debt"]) / df["debt"]
 
     return df
@@ -65,9 +63,7 @@ def get_risks(df: pd.DataFrame, ratio_list: List[float]) -> pd.DataFrame:
 def get_distr(data) -> pd.DataFrame:
     """This function calculates and returns a pivot table by risk levels"""
 
-    risk_distr = data.pivot_table(
-        index="risk_rating", values=["amount"], aggfunc=["sum", "count"]
-    )
+    risk_distr = data.pivot_table(index="risk_rating", values=["amount"], aggfunc=["sum", "count"])
     risk_distr.columns = ["stETH", "cnt"]
     risk_distr["percent"] = (risk_distr["stETH"] / risk_distr["stETH"].sum()) * 100
 
@@ -79,9 +75,7 @@ def bin1(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df.query(
-        "diff_collateral <= 0.8 and diff_debt <= 0.8 and ethdebt > 0", inplace=True
-    )
+    df.query("diff_collateral <= 0.8 and diff_debt <= 0.8 and ethdebt > 0", inplace=True)
 
     return df
 
