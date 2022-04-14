@@ -4,8 +4,8 @@ import logging
 
 from prometheus_client import start_http_server
 
-from .bot import AAVEBot
-from .config import EXPORTER_PORT
+from bot import AAVEBot
+from bot.config import EXPORTER_PORT
 
 log = logging.getLogger(__name__)
 
