@@ -11,11 +11,15 @@ T: TypeAlias = Any
 D = object()  # sentinel
 
 
-def getenv(name: str, astype: Type[T] = str, default: T = D, required: bool = False) -> T:
+def getenv(
+    name: str, astype: Type[T] = str, default: T = D, required: bool = False
+) -> T:
     """Get environment variable in failsafe manner"""
 
-    if required and not default is D:
-        raise ValueError("Unable to parse environment variable with both required and default")
+    if required and default is not D:
+        raise ValueError(
+            "Unable to parse environment variable with both required and default"
+        )
 
     if required and name not in os.environ:
         raise RuntimeError(f"{name} environment variable is required")
@@ -24,7 +28,12 @@ def getenv(name: str, astype: Type[T] = str, default: T = D, required: bool = Fa
         try:
             return astype(os.getenv(name))
         except (TypeError, ValueError) as ex:
-            log.warn(f"Failed to parse {name} environment variable, fallback to {default=}", exc_info=ex)
+            log.warning(
+                "Failed to parse %s environment variable, fallback to %s",
+                name,
+                f"{default=}",
+                exc_info=ex,
+            )
 
     return default
 
@@ -33,7 +42,7 @@ def getenv(name: str, astype: Type[T] = str, default: T = D, required: bool = Fa
 
 INFURA_ENDPOINT = getenv("INFURA_ENDPOINT", required=True)
 if "wss://" in INFURA_ENDPOINT:
-    # WSS provider seems to be broken in python 3.10 and 
+    # WSS provider seems to be broken in python 3.10 and
     # doesn't work in the current flow. Magic asyncio fails happen.
     raise RuntimeError("Only http[s] Web3 provider endpoint supported")
 
@@ -41,6 +50,7 @@ if "wss://" in INFURA_ENDPOINT:
 
 FLIPSIDE_ENDPOINT = getenv(
     "FLIPSIDE_ENDPOINT",
-    default="https://api.flipsidecrypto.com/api/v2/queries/efc8d01b-60c1-4051-9548-2a6daff256a8/data/latest",
+    default="https://api.flipsidecrypto.com/api/v2/"
+    "queries/efc8d01b-60c1-4051-9548-2a6daff256a8/data/latest",
 )
 EXPORTER_PORT = getenv("EXPORTER_PORT", int, default=8080)

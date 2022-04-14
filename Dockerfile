@@ -32,8 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 RUN curl -sSL https://install.python-poetry.org | python -
 RUN poetry --version
 
-RUN poetry install --no-dev
-RUN rm -rf $VENV_PATH/lib/*/site-packages/{pip*,setuptools*}
+RUN poetry install --no-dev && \
+    rm -rf "$VENV_PATH/lib/*/site-packages/{pip*,setuptools*}"
 
 
 FROM base as prod

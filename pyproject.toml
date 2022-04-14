@@ -16,3 +16,11 @@ urllib3 = "^1.26.9"
 pandas = "^1.4.1"
 unsync = "^1.4.0"
 numpy = "^1.22.3"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+pylint = "^2.13.5"
+isort = "^5.10.1"
+
+[tool.pylint.format]
+good-names = "i,j,df,ex"

@@ -5,7 +5,7 @@ from typing import Iterable, List
 
 import pandas as pd
 
-from aaveparser import get_steth_eth_price
+from .aaveparser import get_steth_eth_price
 
 RISK_LABELS = ["A", "B+", "B", "B-", "C", "D", "liquidation"]
 
@@ -29,14 +29,19 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df.fillna(0, inplace=True)
     df = pd.DataFrame(data=df.query("collateral > 0 and debt > 0"))
     steth_price = get_steth_eth_price() / pow(10, DECIMALS_STETH)
-    df["diff_collateral"] = abs(df["collateral"] - df["amount"] * steth_price) / df["collateral"]
+    df["diff_collateral"] = (
+        abs(df["collateral"] - df["amount"] * steth_price) / df["collateral"]
+    )
     df["diff_debt"] = abs(df["ethdebt"] - df["debt"]) / df["debt"]
 
     return df
 
 
 def get_risks(df: pd.DataFrame, ratio_list: List[float]) -> pd.DataFrame:
-    """This function calculates the risk level for each position and returns the positions sorted by risk"""
+    """
+    This function calculates the risk level for each position
+    and returns the positions sorted by risk
+    """
 
     df = df.copy()
 
@@ -60,7 +65,9 @@ def get_risks(df: pd.DataFrame, ratio_list: List[float]) -> pd.DataFrame:
 def get_distr(data) -> pd.DataFrame:
     """This function calculates and returns a pivot table by risk levels"""
 
-    risk_distr = data.pivot_table(index="risk_rating", values=["amount"], aggfunc=["sum", "count"])
+    risk_distr = data.pivot_table(
+        index="risk_rating", values=["amount"], aggfunc=["sum", "count"]
+    )
     risk_distr.columns = ["stETH", "cnt"]
     risk_distr["percent"] = (risk_distr["stETH"] / risk_distr["stETH"].sum()) * 100
 
@@ -72,7 +79,9 @@ def bin1(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df.query("diff_collateral <= 0.8 and diff_debt <= 0.8 and ethdebt > 0", inplace=True)
+    df.query(
+        "diff_collateral <= 0.8 and diff_debt <= 0.8 and ethdebt > 0", inplace=True
+    )
 
     return df
 
@@ -91,10 +100,10 @@ def bin2(df: pd.DataFrame) -> pd.DataFrame:
 def bin3(df: pd.DataFrame) -> pd.DataFrame:
     """All the others AAVE users with stETH collateral"""
 
-    b1 = bin1(df)
-    b2 = bin2(df)
+    bin1_df = bin1(df)
+    bin2_df = bin2(df)
 
-    return pd.DataFrame(pd.concat([df, b1, b2]).drop_duplicates(keep=False))
+    return pd.DataFrame(pd.concat([df, bin1_df, bin2_df]).drop_duplicates(keep=False))
 
 
 def calculate_values(data: pd.DataFrame) -> Iterable[dict[str, float]]:
