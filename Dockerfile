@@ -30,8 +30,8 @@ WORKDIR $APP_PATH
 
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential=12.9
 RUN curl -sSL https://install.python-poetry.org | python -
-RUN poetry --version
 
+COPY ./pyproject.toml ./poetry.lock ./
 RUN poetry install --no-dev && \
     rm -rf "$VENV_PATH/lib/*/site-packages/{pip*,setuptools*}"
 
