@@ -46,6 +46,6 @@ if "wss://" in INFURA_ENDPOINT:
 
 FLIPSIDE_ENDPOINT = getenv(
     "FLIPSIDE_ENDPOINT",
-    default="https://api.flipsidecrypto.com/api/v2/" "queries/efc8d01b-60c1-4051-9548-2a6daff256a8/data/latest",
+    default="https://api.flipsidecrypto.com/api/v2/queries/efc8d01b-60c1-4051-9548-2a6daff256a8/data/latest",
 )
 EXPORTER_PORT = getenv("EXPORTER_PORT", int, default=8080)
