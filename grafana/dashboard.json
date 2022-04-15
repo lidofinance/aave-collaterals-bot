@@ -273,7 +273,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
+          "displayMode": "list",
           "placement": "bottom"
         },
         "tooltip": {
@@ -285,7 +285,7 @@
           "exemplar": true,
           "expr": "sum(aave_bot_collateral_percentage{bin=\"1\", zone=~\"C|D|liquidation\"})",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "C+D+liquidation",
           "refId": "A"
         }
       ],
@@ -439,7 +439,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
+          "displayMode": "list",
           "placement": "bottom"
         },
         "tooltip": {
@@ -451,7 +451,7 @@
           "exemplar": true,
           "expr": "sum(aave_bot_collateral_percentage{bin=\"2\", zone=~\"C|D|liquidation\"})",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "C+D+liquidation",
           "refId": "A"
         }
       ],
@@ -605,7 +605,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
+          "displayMode": "list",
           "placement": "bottom"
         },
         "tooltip": {
@@ -617,7 +617,7 @@
           "exemplar": true,
           "expr": "sum(aave_bot_collateral_percentage{bin=\"3\", zone=~\"C|D|liquidation\"})",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "C+D+liquidation",
           "refId": "A"
         }
       ],
@@ -714,12 +714,12 @@
     "list": []
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "AAVE bot",
   "uid": "wYiKGhynz",
-  "version": 7
+  "version": 8
 }
