@@ -4,7 +4,15 @@ import logging
 import os
 from typing import Any, Type, TypeAlias
 
-logging.basicConfig(level=logging.INFO, handlers=(logging.StreamHandler(),))
+logging_handler = logging.StreamHandler()
+
+if "LOG_TO_JSON" in os.environ:
+    from pythonjsonlogger import jsonlogger
+
+    formatter = jsonlogger.JsonFormatter("%(asctime)%(levelname)%(name)%(message)")
+    logging_handler.setFormatter(formatter)
+
+logging.basicConfig(level=logging.INFO, handlers=(logging_handler,))
 log = logging.getLogger(__name__)
 
 T: TypeAlias = Any
@@ -36,8 +44,8 @@ def getenv(name: str, astype: Type[T] = str, default: T = D, required: bool = Fa
 
 # === Required ===
 
-INFURA_ENDPOINT = getenv("INFURA_ENDPOINT", required=True)
-if "wss://" in INFURA_ENDPOINT:
+NODE_ENPOINT = getenv("NODE_ENPOINT", required=True)
+if "wss://" in NODE_ENPOINT:
     # WSS provider seems to be broken in python 3.10 and
     # doesn't work in the current flow. Magic asyncio fails happen.
     raise RuntimeError("Only http[s] Web3 provider endpoint supported")
