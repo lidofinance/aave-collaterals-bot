@@ -44,8 +44,8 @@ def getenv(name: str, astype: Type[T] = str, default: T = D, required: bool = Fa
 
 # === Required ===
 
-NODE_ENPOINT = getenv("NODE_ENPOINT", required=True)
-if "wss://" in NODE_ENPOINT:
+NODE_ENDPOINT = getenv("NODE_ENDPOINT", required=True)
+if "wss://" in NODE_ENDPOINT:
     # WSS provider seems to be broken in python 3.10 and
     # doesn't work in the current flow. Magic asyncio fails happen.
     raise RuntimeError("Only http[s] Web3 provider endpoint supported")

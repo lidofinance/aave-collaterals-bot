@@ -9,7 +9,7 @@ from pathlib import Path
 from web3 import HTTPProvider, Web3
 from web3.contract import Contract
 
-from .config import NODE_ENPOINT
+from .config import NODE_ENDPOINT
 from .middleware import requests_cache
 
 log = logging.getLogger(__name__)
