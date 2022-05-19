@@ -21,7 +21,7 @@ AAVE_LPOOL_ADDRESS = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"  # Aave v2 Len
 AAVE_ORACLE_ADDRESS = "0xA50ba011c48153De246E5192C8f9258A2ba79Ca9"  # Aave Chain
 ASTETH_ADDRESS = "0x1982b2F5814301d4e9a8b0201555376e62F82428"  # aSTETH token
 
-w3 = Web3(HTTPProvider(NODE_ENPOINT))
+w3 = Web3(HTTPProvider(NODE_ENDPOINT))
 w3.middleware_onion.add(requests_cache, "requests_cache")
 
 
