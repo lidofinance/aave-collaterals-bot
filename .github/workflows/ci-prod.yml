@@ -32,4 +32,4 @@ jobs:
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
           TARGET_REPO: "${{ secrets.TARGET_REPO }}"
           TAG: "${{ steps.image_tag.outputs.TAG }}"
-          TARGET_WORKFLOW: "build_mainnet_aave_collaterals_bot.yml"
+          TARGET_WORKFLOW: "build_mainnet_aave_collaterals_bot.yaml"
