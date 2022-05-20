@@ -57,7 +57,7 @@ All the others AAVE users with stETH collateral
 
 Configure bot via the following environment variables:
 
-- `INFURA_ENDPOINT` is Infura endpoint to fetch data from Etherium node
+- `NODE_ENDPOINT` is ETH1 endpoint
 - `FLIPSIDE_ENDPOINT` is used to fetch indexed data from Flipside (subject to change)
 - `EXPORTER_PORT` is the port to expose metrics on
 
