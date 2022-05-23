@@ -59,7 +59,9 @@ Configure bot via the following environment variables:
 
 - `NODE_ENDPOINT` is ETH1 endpoint
 - `FLIPSIDE_ENDPOINT` is used to fetch indexed data from Flipside (subject to change)
+- `PARSE_INTERVAL` is a delay in seconds between API fetches
 - `EXPORTER_PORT` is the port to expose metrics on
+- `LOG_FORMAT` is one of {"simple", "json"}
 
 #### Visualisation
 
