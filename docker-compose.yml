@@ -1,14 +1,17 @@
-version: '3'
+---
+version: "3"
 
 services:
   aave_bot:
-    build: 
+    build:
       context: .
     command: "main.py"
     environment:
-      INFURA_ENDPOINT:
+      NODE_ENDPOINT:
       FLIPSIDE_ENDPOINT:
       EXPORTER_PORT:
+      PARSE_INTERVAL:
+      LOG_FORMAT:
     restart: unless-stopped
 
   prometheus:
@@ -31,6 +34,6 @@ services:
     environment:
       DISCORD_WEBHOOK:
     restart: unless-stopped
-    
+
 volumes:
   prometheus-data:

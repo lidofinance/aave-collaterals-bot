@@ -6,7 +6,7 @@ from typing import Any, Type, TypeAlias
 
 logging_handler = logging.StreamHandler()
 
-if "LOG_TO_JSON" in os.environ:
+if os.getenv("LOG_FORMAT", "simple") == "json":
     from pythonjsonlogger import jsonlogger
 
     formatter = jsonlogger.JsonFormatter("%(asctime)%(levelname)%(name)%(message)")
@@ -56,4 +56,5 @@ FLIPSIDE_ENDPOINT = getenv(
     "FLIPSIDE_ENDPOINT",
     default="https://api.flipsidecrypto.com/api/v2/queries/efc8d01b-60c1-4051-9548-2a6daff256a8/data/latest",
 )
+PARSE_INTERVAL = getenv("PARSE_INTERVAL", int, default=900)
 EXPORTER_PORT = getenv("EXPORTER_PORT", int, default=8080)
