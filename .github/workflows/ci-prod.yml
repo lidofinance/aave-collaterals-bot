@@ -1,35 +1,48 @@
-name: CI prod
+name: CI Build prod image
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      tag:
+        description: 'tag to deploy from'
+        default: ''
+        required: false
+        type: string
   push:
+    branches:
+      - "!*"
     tags:
-      - "*"
-    branches-ignore:
       - "*"
     paths-ignore:
       - '.github/**'
 
 jobs:
-  main:
+# test:
+#   ...
 
+  deploy:
     runs-on: ubuntu-latest
+    # needs: test
     name: Build and deploy
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Get image tag from git
-        id: image_tag
+        
+      - name: Tag name
+        id: tag_name
         run: |
-          echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
-
+          if [ ${{ inputs.tag }} = '' ]; then
+            echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+          else
+            echo ::set-output name=TAG::${{ inputs.tag }}
+          fi
+      
       - name: Build prod image
-        run: .github/dispatch_workflow.py
+        uses: lidofinance/dispatch-workflow@v1
         env:
           APP_ID: ${{ secrets.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-          TARGET_REPO: "${{ secrets.TARGET_REPO }}"
-          TAG: "${{ steps.image_tag.outputs.TAG }}"
+          TARGET_REPO: "lidofinance/infra-mainnet"
+          TAG: "${{ steps.tag_name.outputs.TAG }}"
           TARGET_WORKFLOW: "build_mainnet_aave_collaterals_bot.yaml"
