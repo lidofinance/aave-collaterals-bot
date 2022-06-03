@@ -1,45 +1,61 @@
 """Workaround to reduce calls count to ETH node"""
+
 # pylint: disable=unused-argument,invalid-name,unused-import
 
 import logging
 from typing import Any, Callable
 
 from web3 import Web3
-from web3.types import Middleware, RPCEndpoint, RPCResponse
+from web3.types import RPCEndpoint, RPCResponse
+
+from .metrics import ETH_RPC_REQUESTS, ETH_RPC_REQUESTS_DURATION
 
 log = logging.getLogger(__name__)
 
 
-def construct_mock_chain_id_middleware() -> Middleware:
+def chain_id_mock(
+    make_request: Callable[[RPCEndpoint, Any], RPCResponse], w3: "Web3"
+) -> Callable[[RPCEndpoint, Any], RPCResponse]:
     """Constructs a middleware which mock eth_chainId method call response"""
 
-    def wrapper(
-        make_request: Callable[[RPCEndpoint, Any], RPCResponse], w3: "Web3"
-    ) -> Callable[[RPCEndpoint, Any], RPCResponse]:
-        def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
+    def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
 
-            if method == "eth_chainId":
-                return {
-                    "id": 0,
-                    "jsonrpc": "2.0",
-                    "result": 1,
-                }
-            return make_request(method, params)
+        # simple_cache_middleware supports eth_chainId method caching but
+        # since we are using threading based concurrency, the middleware
+        # is not applicable (at least as I can se at the moment)
+        if method == "eth_chainId":
+            return {
+                "id": 0,
+                "jsonrpc": "2.0",
+                "result": 1,
+            }
 
-        return middleware
+        return make_request(method, params)
 
-    return wrapper
+    return middleware
 
 
-requests_cache = construct_mock_chain_id_middleware()
+def metrics_collector(
+    make_request: Callable[[RPCEndpoint, Any], RPCResponse], w3: "Web3"
+) -> Callable[[RPCEndpoint, Any], RPCResponse]:
+    """Constructs a middleware which measure requests parameters"""
 
-# The following code should be used, by I cannot make it works at the moment :(
+    def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
 
-# from web3.middleware.cache import construct_simple_cache_middleware
-#
-# requests_cache = construct_simple_cache_middleware(
-#     cache_class=dict,
-#     rpc_whitelist=[  # type: ignore
-#         "eth_chainId",
-#     ],
-# )
+        with ETH_RPC_REQUESTS_DURATION.time():
+            response = make_request(method, params)
+
+        # https://www.jsonrpc.org/specification#error_object
+        # https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal
+        error = response.get("error")
+        code: int = 0
+        if isinstance(error, dict):
+            code = error.get("code") or code
+        ETH_RPC_REQUESTS.labels(
+            method=method,
+            code=code,
+        ).inc()
+
+        return response
+
+    return middleware

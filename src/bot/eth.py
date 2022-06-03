@@ -10,7 +10,7 @@ from web3 import HTTPProvider, Web3
 from web3.contract import Contract
 
 from .config import NODE_ENDPOINT
-from .middleware import requests_cache
+from .middleware import chain_id_mock, metrics_collector
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +22,9 @@ AAVE_ORACLE_ADDRESS = "0xA50ba011c48153De246E5192C8f9258A2ba79Ca9"  # Aave Chain
 ASTETH_ADDRESS = "0x1982b2F5814301d4e9a8b0201555376e62F82428"  # aSTETH token
 
 w3 = Web3(HTTPProvider(NODE_ENDPOINT))
-w3.middleware_onion.add(requests_cache, "requests_cache")
+
+w3.middleware_onion.add(metrics_collector)
+w3.middleware_onion.add(chain_id_mock)
 
 
 @cache
