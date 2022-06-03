@@ -4,11 +4,11 @@ from dataclasses import asdict, dataclass
 from typing import Iterable
 
 import pandas as pd
-import requests
 from unsync import unsync
 
 from .config import FLIPSIDE_ENDPOINT
 from .eth import AAVE_LPOOL, AAVE_ORACLE, ASTETH, w3
+from .http import requests_get
 
 LIDO_STETH = w3.toChecksumAddress("0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
 
@@ -35,8 +35,8 @@ class CoinGeckoPriceRequestParams:
 def _crypto_to_usd(currency: str) -> float:
 
     payload = CoinGeckoPriceRequestParams(ids=currency)
-    response = requests.get(
-        "https://api.coingecko.com/api/v3/simple/price",
+    response = requests_get(
+        url="https://api.coingecko.com/api/v3/simple/price",
         params=asdict(payload),
         timeout=5,
     )
@@ -89,7 +89,7 @@ def get_userlist() -> Iterable:
     """Get the list of borrowers.
     NB! It's subject to change!"""
 
-    response = requests.get(FLIPSIDE_ENDPOINT, timeout=15)
+    response = requests_get(url=FLIPSIDE_ENDPOINT, timeout=15)
     response.raise_for_status()
     return response.json()
 

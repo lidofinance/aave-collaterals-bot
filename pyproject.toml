@@ -9,7 +9,7 @@ repository = "https://github.com/lidofinance/aave-collaterals-bot"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-web3 = "^5.28.0"
+web3 = "5.29.1"
 prometheus-client = "^0.13.1"
 retry = "^0.9.2"
 urllib3 = "^1.26.9"
