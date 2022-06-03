@@ -1,4 +1,4 @@
-name: CI dev
+name: CI Dev
 
 on:
   workflow_dispatch:
@@ -6,22 +6,21 @@ on:
     branches:
       - develop
     paths-ignore:
-      - '.github/**'
+      - ".github/**"
 
 jobs:
-  main:
-
+  deploy:
     runs-on: ubuntu-latest
+    # needs: test
     name: Build and deploy
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Testnet deploy
-        run: .github/dispatch_workflow.py
+        uses: lidofinance/dispatch-workflow@v1
         env:
           APP_ID: ${{ secrets.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-          TARGET_REPO: "${{ secrets.TARGET_REPO }}"
+          TARGET_REPO: "lidofinance/infra-mainnet"
           TARGET_WORKFLOW: "deploy_testnet_aave_collaterals_bot.yaml"
