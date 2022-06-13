@@ -1,3 +1,17 @@
+# [1.4.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.3.0...1.4.0) (2022-06-13)
+
+
+### Bug Fixes
+
+* Release flow ([cbd7a49](https://github.com/lidofinance/aave-collaterals-bot/commit/cbd7a49e4319c91cdc08adcdf3e438b826ef1005))
+
+
+### Features
+
+* **metrics:** add build info metric ([3508fe6](https://github.com/lidofinance/aave-collaterals-bot/commit/3508fe61464421dc83634605e20d3358e9d6ab99))
+
+
+
 # [1.3.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.2.0...1.3.0) (2022-06-03)
 
 
