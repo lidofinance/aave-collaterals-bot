@@ -1,3 +1,12 @@
+## [1.4.1](https://github.com/lidofinance/aave-collaterals-bot/compare/1.4.0...1.4.1) (2022-06-20)
+
+
+### Bug Fixes
+
+* **analytics:** fix mistakes in bins definitions ([f2ec77a](https://github.com/lidofinance/aave-collaterals-bot/commit/f2ec77ad31fbc287956ad3baaf62037aaa9e301e))
+
+
+
 # [1.4.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.3.0...1.4.0) (2022-06-13)
 
 
