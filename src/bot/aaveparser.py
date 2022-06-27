@@ -1,5 +1,6 @@
 """Module for parsing data from Anchor protocol contracts"""
 
+import time
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
@@ -11,6 +12,7 @@ from .eth import AAVE_LPOOL, AAVE_ORACLE, AAVE_WETH_STABLE_DEBT, AAVE_WETH_VAR_D
 from .http import requests_get
 
 LIDO_STETH = w3.toChecksumAddress("0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
+MS_3_MIN = 3 * 60 * 1000
 
 
 def get_steth_eth_price() -> int:
@@ -32,28 +34,45 @@ class CoinGeckoPriceRequestParams:
     include_last_updated_at: str = "false"
 
 
-def _crypto_to_usd(currency: str) -> float:
+@dataclass
+class CoinGeckoChartRequestParams:
+    """Payload for request to /coins/{id}/market_chart
+    @see https://www.coingecko.com/en/api/documentation for details."""
 
-    payload = CoinGeckoPriceRequestParams(ids=currency)
+    vs_currency: str = "usd"
+    days: int = 1
+
+
+def _crypto_to_usd(currency: str, timestamp_ns: int) -> float:
+
+    unix_ts = timestamp_ns // pow(10, 6)  # will be block.timestamp soon
+    payload = CoinGeckoChartRequestParams()
     response = requests_get(
-        url="https://api.coingecko.com/api/v3/simple/price",
+        url=f"https://api.coingecko.com/api/v3/coins/{currency}/market_chart",
         params=asdict(payload),
         timeout=5,
     )
     response.raise_for_status()
-    return response.json()[currency]["usd"]
+    prices = [(ts, price) for ts, price in response.json()["prices"] if ts <= unix_ts]
+    if not prices:
+        raise Exception("No price information within the given timestamp")
+    prices.sort(key=lambda x: x[0])  # sort by ts
+    ts, price = prices[-1]
+    if unix_ts - ts > MS_3_MIN:
+        raise Exception(f"Stale price data, last available {ts=}")
+    return price
 
 
 def eth_last_price() -> float:
     """Current price of ETH"""
 
-    return _crypto_to_usd("ethereum")
+    return _crypto_to_usd("ethereum", time.time_ns())
 
 
 def steth_last_price() -> float:
     """Current price of stETH"""
 
-    return _crypto_to_usd("staked-ether")
+    return _crypto_to_usd("staked-ether", time.time_ns())
 
 
 @dataclass
