@@ -7,7 +7,7 @@ import pandas as pd
 from unsync import unsync
 
 from .config import FLIPSIDE_ENDPOINT
-from .eth import AAVE_LPOOL, AAVE_ORACLE, ASTETH, w3
+from .eth import AAVE_LPOOL, AAVE_ORACLE, AAVE_WETH_STABLE_DEBT, AAVE_WETH_VAR_DEBT, ASTETH, w3
 from .http import requests_get
 
 LIDO_STETH = w3.toChecksumAddress("0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
@@ -85,6 +85,19 @@ def get_asteth_balance(user: str) -> float:
     return ASTETH.functions.balanceOf(address).call()
 
 
+@unsync
+def get_eth_debt(user: str) -> float:
+    """Get balance of user from AAVE tokens contracts"""
+
+    address = w3.toChecksumAddress(user)
+    return sum(
+        (
+            AAVE_WETH_STABLE_DEBT.functions.balanceOf(address).call(),
+            AAVE_WETH_VAR_DEBT.functions.balanceOf(address).call(),
+        )
+    )
+
+
 def get_userlist() -> Iterable:
     """Get the list of borrowers.
     NB! It's subject to change!"""
@@ -98,8 +111,8 @@ def parse() -> pd.DataFrame:
     """Parse required data"""
 
     df = pd.DataFrame(get_userlist())
+    df = df[["user"]]
     df.set_index("user")
-    del df["amount"]  # will be parsed separately
 
     @unsync
     def _parse_stats():
@@ -131,7 +144,17 @@ def parse() -> pd.DataFrame:
             buf.append({"user": user, "amount": balance})
         return buf
 
-    tasks = [_parse_stats(), _parse_balance()]
+    @unsync
+    def _parse_eth_debth():
+
+        buf = []
+        tasks = [(user, get_eth_debt(user)) for user in df["user"]]
+        for user, task in tasks:
+            balance: float = task.result()  # type: ignore
+            buf.append({"user": user, "ethdebt": balance})
+        return buf
+
+    tasks = [_parse_stats(), _parse_balance(), _parse_eth_debth()]
     parts = [pd.DataFrame(task.result()) for task in tasks]  # type: ignore # pylint: disable=no-member
 
     for part in parts:
