@@ -6,12 +6,17 @@ import logging
 from typing import Any, Callable
 
 from requests import HTTPError, Response
+from retry.api import retry_call
 from web3 import Web3
 from web3.types import RPCEndpoint, RPCResponse
 
 from .metrics import ETH_RPC_REQUESTS, ETH_RPC_REQUESTS_DURATION
 
 log = logging.getLogger(__name__)
+
+
+RETRIES_COUNT = 3
+RETRIES_DELAY = 10
 
 
 def chain_id_mock(
@@ -66,5 +71,22 @@ def metrics_collector(
             ).inc()
 
             return response
+
+    return middleware
+
+
+def retryable(
+    make_request: Callable[[RPCEndpoint, Any], RPCResponse], w3: "Web3"
+) -> Callable[[RPCEndpoint, Any], RPCResponse]:
+    """Constructs a middleware which retries requests to the endpoint"""
+
+    def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
+
+        return retry_call(
+            make_request,
+            (method, params),
+            tries=RETRIES_COUNT,
+            delay=RETRIES_DELAY,
+        )
 
     return middleware
