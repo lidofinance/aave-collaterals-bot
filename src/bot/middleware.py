@@ -5,6 +5,7 @@
 import logging
 from typing import Any, Callable
 
+from requests import HTTPError, Response
 from web3 import Web3
 from web3.types import RPCEndpoint, RPCResponse
 
@@ -42,20 +43,28 @@ def metrics_collector(
 
     def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
 
-        with ETH_RPC_REQUESTS_DURATION.time():
-            response = make_request(method, params)
+        try:
+            with ETH_RPC_REQUESTS_DURATION.time():
+                response = make_request(method, params)
+        except HTTPError as ex:
+            failed: Response = ex.response
+            ETH_RPC_REQUESTS.labels(
+                method=method,
+                code=failed.status_code,
+            ).inc()
+            raise
+        else:
+            # https://www.jsonrpc.org/specification#error_object
+            # https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal
+            error = response.get("error")
+            code: int = 0
+            if isinstance(error, dict):
+                code = error.get("code") or code
+            ETH_RPC_REQUESTS.labels(
+                method=method,
+                code=code,
+            ).inc()
 
-        # https://www.jsonrpc.org/specification#error_object
-        # https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal
-        error = response.get("error")
-        code: int = 0
-        if isinstance(error, dict):
-            code = error.get("code") or code
-        ETH_RPC_REQUESTS.labels(
-            method=method,
-            code=code,
-        ).inc()
-
-        return response
+            return response
 
     return middleware
