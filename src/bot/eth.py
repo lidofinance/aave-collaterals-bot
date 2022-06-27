@@ -10,7 +10,7 @@ from web3 import HTTPProvider, Web3
 from web3.contract import Contract
 
 from .config import NODE_ENDPOINT
-from .middleware import chain_id_mock, metrics_collector
+from .middleware import chain_id_mock, metrics_collector, retryable
 
 log = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ ASTETH_ADDRESS = "0x1982b2F5814301d4e9a8b0201555376e62F82428"  # aSTETH token
 w3 = Web3(HTTPProvider(NODE_ENDPOINT))
 
 w3.middleware_onion.add(metrics_collector)
+w3.middleware_onion.add(retryable)
 w3.middleware_onion.add(chain_id_mock)
 
 
