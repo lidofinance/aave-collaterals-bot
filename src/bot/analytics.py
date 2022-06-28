@@ -77,7 +77,7 @@ def bin1(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df.query("diff_collateral <= 0.8 and diff_debt <= 0.8 and ethdebt > 0", inplace=True)
+    df.query("diff_collateral <= 0.2 and diff_debt <= 0.2 and ethdebt > 0", inplace=True)
 
     return df
 
@@ -90,7 +90,7 @@ def bin2(df: pd.DataFrame) -> pd.DataFrame:
     df.query("diff_debt > 0.8", inplace=True)
     df.sort_values(by=(["amount"]), ascending=False, inplace=True)
 
-    return df.head(100)
+    return df
 
 
 def bin3(df: pd.DataFrame) -> pd.DataFrame:
