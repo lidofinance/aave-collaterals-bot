@@ -6,15 +6,13 @@ from typing import Iterable, List
 import pandas as pd
 
 from .aaveparser import get_steth_eth_price
+from .consts import DECIMALS_AWETH, DECIMALS_HEALTHF, DECIMALS_STETH
 
 RISK_LABELS = ["A", "B+", "B", "B-", "C", "D", "liquidation"]
 
 RISK_VALUES_BIN1 = [1.42, 1.21, 1.14, 1.07, 1.03, 1.00]
 RISK_VALUES_BIN2 = [2.50, 1.75, 1.50, 1.25, 1.10, 1.00]
 RISK_VALUES_BIN3 = [2.50, 1.75, 1.50, 1.25, 1.10, 1.00]
-
-DECIMALS_STETH = 18
-DECIMALS_AWETH = 18
 
 
 def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -26,7 +24,7 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df["collateral"] = df["collateral"] / pow(10, DECIMALS_STETH)
     df["debt"] = df["debt"] / pow(10, DECIMALS_STETH)
     df["ethdebt"] = df["ethdebt"] / pow(10, DECIMALS_AWETH)
-    df["healthf"] = df["healthf"] / pow(10, 18)
+    df["healthf"] = df["healthf"] / pow(10, DECIMALS_HEALTHF)
 
     df.fillna(0, inplace=True)
     df = pd.DataFrame(data=df.query("collateral > 0 and debt > 0"))

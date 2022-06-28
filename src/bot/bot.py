@@ -16,6 +16,7 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
     """The main class of the Aave bot"""
 
     def __init__(self) -> None:
+        self.block: int | None = None
         self.log = logging.getLogger(__name__)
         self.pprint = PrettyPrinter(indent=4)
 
@@ -38,10 +39,9 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
         while True:
 
             try:
-                self.log.info("Fetching has been started")
                 with FETCH_DURATION.time():
-                    with APP_ERRORS.labels("fetching").count_exceptions():
-                        ledger = parse()
+                    with APP_ERRORS.labels("total").count_exceptions():
+                        self.block, ledger = parse(self.block)
                 self._compute_metrics(ledger)
             except Exception as ex:  # pylint: disable=broad-except
                 self.log.error("An error occurred", exc_info=ex)
