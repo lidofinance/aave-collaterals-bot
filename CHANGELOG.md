@@ -1,3 +1,23 @@
+# [1.5.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.4.1...1.5.0) (2022-06-28)
+
+
+### Bug Fixes
+
+* **analytics:** fix mistakes in bins definitions ([0f1d70a](https://github.com/lidofinance/aave-collaterals-bot/commit/0f1d70ab87137b5e588a14e6929ea3fa5951aa1f))
+* **linters:** ts is a good name ([c6640aa](https://github.com/lidofinance/aave-collaterals-bot/commit/c6640aadd2ed6226dc1eca7382083baaa700c1df))
+* **parsing:** fetch data from blockchain within the block ([96bdae7](https://github.com/lidofinance/aave-collaterals-bot/commit/96bdae7372e12abe6e7019042d6c6118ce9ca358))
+
+
+### Features
+
+* **eth:** add retryable middleware ([66291fa](https://github.com/lidofinance/aave-collaterals-bot/commit/66291fac27db698669aaa8d4645648c235f98d9e))
+* **eth:** improve metrics middleware ([d25ce83](https://github.com/lidofinance/aave-collaterals-bot/commit/d25ce83175dcfe5d404266ea400bbc9daf2f11f1))
+* **grafana:** add status dashboard ([3e09bca](https://github.com/lidofinance/aave-collaterals-bot/commit/3e09bca1e580e6a8e7c1ed27f5a51a723ec5df2b))
+* **parser:** get coin price within the given timestamp ([d05bb43](https://github.com/lidofinance/aave-collaterals-bot/commit/d05bb4348f2d7dade6decb0421c8f24d4a25df3c))
+* **parsing:** parse eth debt from blockchain ([3903ac6](https://github.com/lidofinance/aave-collaterals-bot/commit/3903ac64b055c4757233f27edbbfa5edf5e9a7d8))
+
+
+
 ## [1.4.1](https://github.com/lidofinance/aave-collaterals-bot/compare/1.4.0...1.4.1) (2022-06-20)
 
 
