@@ -5,6 +5,7 @@ import time
 from pprint import PrettyPrinter
 
 import pandas as pd
+from web3.types import BlockIdentifier
 
 from .aaveparser import parse
 from .analytics import calculate_values
@@ -20,9 +21,9 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
         self.log = logging.getLogger(__name__)
         self.pprint = PrettyPrinter(indent=4)
 
-    def _compute_metrics(self, data: pd.DataFrame) -> None:
+    def _compute_metrics(self, data: pd.DataFrame, block: BlockIdentifier) -> None:
         with APP_ERRORS.labels("calculations").count_exceptions():
-            values = calculate_values(data)
+            values = calculate_values(data, block)
         for bin, stat in enumerate(values):  # pylint: disable=redefined-builtin
             for zone, percent in stat.items():
                 COLLATERALS_ZONES_PERCENT.labels(zone, bin + 1).set(percent)
@@ -40,9 +41,9 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
 
             try:
                 with FETCH_DURATION.time():
-                    with APP_ERRORS.labels("total").count_exceptions():
+                    with APP_ERRORS.labels("fetching").count_exceptions():
                         self.block, ledger = parse(self.block)
-                self._compute_metrics(ledger)
+                self._compute_metrics(ledger, self.block)
             except Exception as ex:  # pylint: disable=broad-except
                 self.log.error("An error occurred", exc_info=ex)
 
