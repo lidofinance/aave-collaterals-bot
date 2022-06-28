@@ -8,7 +8,6 @@ services:
     command: "main.py"
     environment:
       NODE_ENDPOINT:
-      FLIPSIDE_ENDPOINT:
       EXPORTER_PORT:
       PARSE_INTERVAL:
       LOG_FORMAT:
