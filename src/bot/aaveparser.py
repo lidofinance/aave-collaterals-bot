@@ -7,16 +7,16 @@ from typing import Iterable
 
 import pandas as pd
 from unsync import unsync
-from web3.types import BlockData, BlockIdentifier
+from web3.types import BlockIdentifier
 
 from .config import FLIPSIDE_ENDPOINT
+from .consts import AAVE_FIRST_BLOCK, DECIMALS_ASTETH, LIDO_STETH, MS_3_MIN
 from .eth import AAVE_LPOOL, AAVE_ORACLE, AAVE_WETH_STABLE_DEBT, AAVE_WETH_VAR_DEBT, ASTETH, w3
 from .http import requests_get
 
 log = logging.getLogger(__name__)
 
-LIDO_STETH = w3.toChecksumAddress("0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
-MS_3_MIN = 3 * 60 * 1000
+ASTETH_HOLDERS = set()  # cache for hodlers
 
 
 def get_steth_eth_price() -> int:
@@ -130,29 +130,59 @@ def get_userlist() -> Iterable:
     return response.json()
 
 
-def get_latest_block() -> BlockData:
-    """Get the latest ETH block"""
+def get_latest_block() -> int:
+    """Get the latest ETH block number"""
 
-    return w3.eth.get_block("latest")
+    return w3.eth.block_number
 
 
-def parse() -> pd.DataFrame:
+def fetch_asteth_holders(start_block: int, last_block: int) -> list[dict]:
+    """Fetch astETH holders from ETH"""
+
+    res = []
+
+    log.info("Fetching astETH holders within the blocks range %d,%d", start_block, last_block)
+    batch_size = 100000
+    block = start_block
+    while block <= last_block:
+        events = ASTETH.events.Mint.getLogs(fromBlock=block, toBlock=block + batch_size)
+        for event in events:  # store new minters
+            holder = event["args"]["from"]
+            ASTETH_HOLDERS.add(holder)
+        block += batch_size
+
+    tasks = [(holder, get_asteth_balance(holder, last_block)) for holder in ASTETH_HOLDERS]
+    threshold = pow(10, DECIMALS_ASTETH) // 10  # 0.1
+    for holder, task in tasks:
+        balance = task.result()  # type: ignore
+        if balance <= threshold:
+            ASTETH_HOLDERS.remove(holder)
+            continue
+        res.append({"user": holder, "amount": balance})
+
+    log.info("Found %d holders with non-zero balance", len(res))
+    return res
+
+
+def parse(start_block: int | None = None) -> tuple[int, pd.DataFrame]:
     """Parse required data"""
 
     latest_block = get_latest_block()
-    block_number = latest_block["number"]  # type: ignore
-    log.info("Parse started at block %d", block_number)
+    if latest_block == start_block:
+        raise Exception(f"Block {start_block} has been already read")
 
-    # will be changed to parsing from the blockchain
-    df = pd.DataFrame(get_userlist())
-    df = df[["user"]]
+    log.info("Fetching data at the block %d", latest_block)
+    start_block = start_block or AAVE_FIRST_BLOCK
+    users = fetch_asteth_holders(start_block, latest_block)
+
+    df = pd.DataFrame(users)
     df.set_index("user")
 
     @unsync
     def _parse_stats():
 
         buf = []
-        tasks = [(user, get_user_stats(user, block_number)) for user in df["user"]]
+        tasks = [(user, get_user_stats(user, latest_block)) for user in df["user"]]
         for user, task in tasks:
             stat: LendingPoolResponse = task.result()  # type: ignore
             buf.append(
@@ -169,29 +199,19 @@ def parse() -> pd.DataFrame:
         return buf
 
     @unsync
-    def _parse_balance():
-
-        buf = []
-        tasks = [(user, get_asteth_balance(user, block_number)) for user in df["user"]]
-        for user, task in tasks:
-            balance: float = task.result()  # type: ignore
-            buf.append({"user": user, "amount": balance})
-        return buf
-
-    @unsync
     def _parse_eth_debth():
 
         buf = []
-        tasks = [(user, get_eth_debt(user, block_number)) for user in df["user"]]
+        tasks = [(user, get_eth_debt(user, latest_block)) for user in df["user"]]
         for user, task in tasks:
-            balance: float = task.result()  # type: ignore
-            buf.append({"user": user, "ethdebt": balance})
+            debt: float = task.result()  # type: ignore
+            buf.append({"user": user, "ethdebt": debt})
         return buf
 
-    tasks = [_parse_stats(), _parse_balance(), _parse_eth_debth()]
+    tasks = [_parse_stats(), _parse_eth_debth()]
     parts = [pd.DataFrame(task.result()) for task in tasks]  # type: ignore # pylint: disable=no-member
 
     for part in parts:
         df = df.merge(part, on="user", how="left")
 
-    return df
+    return latest_block, df
