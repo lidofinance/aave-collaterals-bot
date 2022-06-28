@@ -1,16 +1,22 @@
 """Module for parsing data from Anchor protocol contracts"""
 
+import logging
+import time
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
 import pandas as pd
 from unsync import unsync
+from web3.types import BlockData, BlockIdentifier
 
 from .config import FLIPSIDE_ENDPOINT
-from .eth import AAVE_LPOOL, AAVE_ORACLE, ASTETH, w3
+from .eth import AAVE_LPOOL, AAVE_ORACLE, AAVE_WETH_STABLE_DEBT, AAVE_WETH_VAR_DEBT, ASTETH, w3
 from .http import requests_get
 
+log = logging.getLogger(__name__)
+
 LIDO_STETH = w3.toChecksumAddress("0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
+MS_3_MIN = 3 * 60 * 1000
 
 
 def get_steth_eth_price() -> int:
@@ -32,28 +38,45 @@ class CoinGeckoPriceRequestParams:
     include_last_updated_at: str = "false"
 
 
-def _crypto_to_usd(currency: str) -> float:
+@dataclass
+class CoinGeckoChartRequestParams:
+    """Payload for request to /coins/{id}/market_chart
+    @see https://www.coingecko.com/en/api/documentation for details."""
 
-    payload = CoinGeckoPriceRequestParams(ids=currency)
+    vs_currency: str = "usd"
+    days: int = 1
+
+
+def _crypto_to_usd(currency: str, timestamp_ns: int) -> float:
+
+    unix_ts = timestamp_ns // pow(10, 6)  # will be block.timestamp soon
+    payload = CoinGeckoChartRequestParams()
     response = requests_get(
-        url="https://api.coingecko.com/api/v3/simple/price",
+        url=f"https://api.coingecko.com/api/v3/coins/{currency}/market_chart",
         params=asdict(payload),
         timeout=5,
     )
     response.raise_for_status()
-    return response.json()[currency]["usd"]
+    prices = [(ts, price) for ts, price in response.json()["prices"] if ts <= unix_ts]
+    if not prices:
+        raise Exception("No price information within the given timestamp")
+    prices.sort(key=lambda x: x[0])  # sort by ts
+    ts, price = prices[-1]
+    if unix_ts - ts > MS_3_MIN:
+        raise Exception(f"Stale price data, last available {ts=}")
+    return price
 
 
 def eth_last_price() -> float:
     """Current price of ETH"""
 
-    return _crypto_to_usd("ethereum")
+    return _crypto_to_usd("ethereum", time.time_ns())
 
 
 def steth_last_price() -> float:
     """Current price of stETH"""
 
-    return _crypto_to_usd("staked-ether")
+    return _crypto_to_usd("staked-ether", time.time_ns())
 
 
 @dataclass
@@ -69,20 +92,33 @@ class LendingPoolResponse:
 
 
 @unsync
-def get_user_stats(user: str) -> LendingPoolResponse:
+def get_user_stats(user: str, block: BlockIdentifier = "latest") -> LendingPoolResponse:
     """Parse user stat from AAVE Lending Pool"""
 
     address = w3.toChecksumAddress(user)
-    result = AAVE_LPOOL.functions.getUserAccountData(address).call()
+    result = AAVE_LPOOL.functions.getUserAccountData(address).call(block_identifier=block)
     return LendingPoolResponse(*result)
 
 
 @unsync
-def get_asteth_balance(user: str) -> float:
+def get_asteth_balance(user: str, block: BlockIdentifier = "latest") -> float:
     """Get user's astETH balance"""
 
     address = w3.toChecksumAddress(user)
-    return ASTETH.functions.balanceOf(address).call()
+    return ASTETH.functions.balanceOf(address).call(block_identifier=block)
+
+
+@unsync
+def get_eth_debt(user: str, block: BlockIdentifier) -> float:
+    """Get balance of user from AAVE tokens contracts"""
+
+    address = w3.toChecksumAddress(user)
+    return sum(
+        (
+            AAVE_WETH_STABLE_DEBT.functions.balanceOf(address).call(block_identifier=block),
+            AAVE_WETH_VAR_DEBT.functions.balanceOf(address).call(block_identifier=block),
+        )
+    )
 
 
 def get_userlist() -> Iterable:
@@ -94,18 +130,29 @@ def get_userlist() -> Iterable:
     return response.json()
 
 
+def get_latest_block() -> BlockData:
+    """Get the latest ETH block"""
+
+    return w3.eth.get_block("latest")
+
+
 def parse() -> pd.DataFrame:
     """Parse required data"""
 
+    latest_block = get_latest_block()
+    block_number = latest_block["number"]  # type: ignore
+    log.info("Parse started at block %d", block_number)
+
+    # will be changed to parsing from the blockchain
     df = pd.DataFrame(get_userlist())
+    df = df[["user"]]
     df.set_index("user")
-    del df["amount"]  # will be parsed separately
 
     @unsync
     def _parse_stats():
 
         buf = []
-        tasks = [(user, get_user_stats(user)) for user in df["user"]]
+        tasks = [(user, get_user_stats(user, block_number)) for user in df["user"]]
         for user, task in tasks:
             stat: LendingPoolResponse = task.result()  # type: ignore
             buf.append(
@@ -125,13 +172,23 @@ def parse() -> pd.DataFrame:
     def _parse_balance():
 
         buf = []
-        tasks = [(user, get_asteth_balance(user)) for user in df["user"]]
+        tasks = [(user, get_asteth_balance(user, block_number)) for user in df["user"]]
         for user, task in tasks:
             balance: float = task.result()  # type: ignore
             buf.append({"user": user, "amount": balance})
         return buf
 
-    tasks = [_parse_stats(), _parse_balance()]
+    @unsync
+    def _parse_eth_debth():
+
+        buf = []
+        tasks = [(user, get_eth_debt(user, block_number)) for user in df["user"]]
+        for user, task in tasks:
+            balance: float = task.result()  # type: ignore
+            buf.append({"user": user, "ethdebt": balance})
+        return buf
+
+    tasks = [_parse_stats(), _parse_balance(), _parse_eth_debth()]
     parts = [pd.DataFrame(task.result()) for task in tasks]  # type: ignore # pylint: disable=no-member
 
     for part in parts:
