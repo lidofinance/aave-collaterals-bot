@@ -4,6 +4,7 @@ from contextlib import suppress
 from typing import Iterable, List
 
 import pandas as pd
+from web3.types import BlockIdentifier
 
 from .aaveparser import get_steth_eth_price
 from .consts import DECIMALS_AWETH, DECIMALS_HEALTHF, DECIMALS_STETH
@@ -15,7 +16,7 @@ RISK_VALUES_BIN2 = [2.50, 1.75, 1.50, 1.25, 1.10, 1.00]
 RISK_VALUES_BIN3 = [2.50, 1.75, 1.50, 1.25, 1.10, 1.00]
 
 
-def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
+def prepare_data(df: pd.DataFrame, block: BlockIdentifier) -> pd.DataFrame:
     """Transform raw data received"""
 
     df = df.copy()
@@ -28,7 +29,7 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df.fillna(0, inplace=True)
     df = pd.DataFrame(data=df.query("collateral > 0 and debt > 0"))
-    steth_price = get_steth_eth_price() / pow(10, DECIMALS_STETH)
+    steth_price = get_steth_eth_price(block) / pow(10, DECIMALS_STETH)
     df["diff_collateral"] = abs(df["collateral"] - df["amount"] * steth_price) / df["collateral"]
     df["diff_debt"] = abs(df["ethdebt"] - df["debt"]) / df["debt"]
 
@@ -100,11 +101,11 @@ def bin3(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(pd.concat([df, bin1_df, bin2_df]).drop_duplicates(keep=False))
 
 
-def calculate_values(data: pd.DataFrame) -> Iterable[dict[str, float]]:
+def calculate_values(data: pd.DataFrame, block: BlockIdentifier) -> Iterable[dict[str, float]]:
     """Calculate risk distribution.
     Almost as is from related jupyter notebook."""
 
-    data = prepare_data(data)
+    data = prepare_data(data, block)
 
     bins = (
         (bin1, RISK_VALUES_BIN1),
