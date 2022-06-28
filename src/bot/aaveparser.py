@@ -1,16 +1,15 @@
 """Module for parsing data from Anchor protocol contracts"""
 
 import logging
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Iterable
 
 import pandas as pd
-from retry import retry
 from unsync import unsync
 from web3.types import BlockData, BlockIdentifier
 
 from .config import FLIPSIDE_ENDPOINT
-from .consts import AAVE_FIRST_BLOCK, DECIMALS_ASTETH, HTTP_REQUESTS_DELAY, HTTP_REQUESTS_RETRY, LIDO_STETH, MS_3_MIN
+from .consts import AAVE_FIRST_BLOCK, DECIMALS_ASTETH, LIDO_STETH
 from .eth import AAVE_LPOOL, AAVE_ORACLE, AAVE_WETH_STABLE_DEBT, AAVE_WETH_VAR_DEBT, ASTETH, w3
 from .http import requests_get
 
@@ -23,62 +22,6 @@ def get_steth_eth_price(block: BlockIdentifier) -> int:
     """Get the price of stETH in ETH from AAVE protocol"""
 
     return AAVE_ORACLE.functions.getAssetPrice(LIDO_STETH).call(block_identifier=block)
-
-
-@dataclass
-class CoinGeckoPriceRequestParams:
-    """Payload for request to /simple/price
-    @see https://www.coingecko.com/en/api/documentation for details."""
-
-    ids: str
-    vs_currencies: str = "usd"
-    include_market_cap: str = "false"
-    include_24hr_vol: str = "false"
-    include_24hr_change: str = "false"
-    include_last_updated_at: str = "false"
-
-
-@dataclass
-class CoinGeckoChartRequestParams:
-    """Payload for request to /coins/{id}/market_chart
-    @see https://www.coingecko.com/en/api/documentation for details."""
-
-    vs_currency: str = "usd"
-    days: int = 1
-
-
-def _crypto_to_usd(currency: str, block: BlockIdentifier) -> float:
-
-    block_ts = get_block_info(block)["timestamp"] * 1000  # type: ignore
-    payload = CoinGeckoChartRequestParams()
-    response = requests_get(
-        url=f"https://api.coingecko.com/api/v3/coins/{currency}/market_chart",
-        params=asdict(payload),
-        timeout=5,
-    )
-    response.raise_for_status()
-    prices = [(ts, price) for ts, price in response.json()["prices"] if ts <= block_ts]
-    if not prices:
-        raise Exception("No price information within the given timestamp")
-    prices.sort(key=lambda x: x[0])  # sort by ts
-    ts, price = prices[-1]
-    if block_ts - ts > MS_3_MIN:
-        raise Exception(f"Stale price data, last available {ts=}")
-    return price
-
-
-@retry(tries=HTTP_REQUESTS_RETRY, delay=HTTP_REQUESTS_DELAY)
-def eth_price(block: BlockIdentifier = "latest") -> float:
-    """Current price of ETH"""
-
-    return _crypto_to_usd("ethereum", block)
-
-
-@retry(tries=HTTP_REQUESTS_RETRY, delay=HTTP_REQUESTS_DELAY)
-def steth_price(block: BlockIdentifier = "latest") -> float:
-    """Current price of stETH"""
-
-    return _crypto_to_usd("staked-ether", block)
 
 
 @dataclass
