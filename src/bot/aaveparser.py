@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 import pandas as pd
+from eth_typing.encoding import HexStr
 from unsync import unsync
 from web3.types import BlockData, BlockIdentifier
 
@@ -15,7 +16,17 @@ from .http import requests_get
 
 log = logging.getLogger(__name__)
 
-ASTETH_HOLDERS = set()  # cache for hodlers
+
+class AddressSet(set):
+    """Set for ETH addresses"""
+
+    def add(self, __element: HexStr) -> None:
+        if w3.toInt(hexstr=__element) == 0:
+            return  # skip NULL address
+        super().add(__element)
+
+
+ASTETH_HOLDERS = AddressSet()  # cache for hodlers
 
 
 def get_steth_eth_price(block: BlockIdentifier) -> int:
@@ -96,10 +107,14 @@ def fetch_asteth_holders(start_block: int, last_block: int) -> list[dict]:
     batch_size = 100000
     block = start_block
     while block <= last_block:
-        events = ASTETH.events.Mint.getLogs(fromBlock=block, toBlock=block + batch_size)
-        for event in events:  # store new minters
-            holder = event["args"]["from"]
-            ASTETH_HOLDERS.add(holder)
+        args = {
+            "fromBlock": block,
+            "toBlock": block + batch_size,
+        }
+        events = ASTETH.events.Transfer.getLogs(**args)
+        for event in events:
+            ASTETH_HOLDERS.add(event["args"]["from"])
+            ASTETH_HOLDERS.add(event["args"]["to"])
         block += batch_size
 
     tasks = [(holder, get_asteth_balance(holder, last_block)) for holder in ASTETH_HOLDERS]
