@@ -2,17 +2,14 @@
 
 import logging
 from dataclasses import dataclass
-from typing import Iterable
 
 import pandas as pd
 from eth_typing.encoding import HexStr
 from unsync import unsync
 from web3.types import BlockData, BlockIdentifier
 
-from .config import FLIPSIDE_ENDPOINT
 from .consts import AAVE_FIRST_BLOCK, DECIMALS_ASTETH, LIDO_STETH
 from .eth import AAVE_LPOOL, AAVE_ORACLE, AAVE_WETH_STABLE_DEBT, AAVE_WETH_VAR_DEBT, ASTETH, w3
-from .http import requests_get
 
 log = logging.getLogger(__name__)
 
@@ -75,15 +72,6 @@ def get_eth_debt(user: str, block: BlockIdentifier) -> float:
             AAVE_WETH_VAR_DEBT.functions.balanceOf(address).call(block_identifier=block),
         )
     )
-
-
-def get_userlist() -> Iterable:
-    """Get the list of borrowers.
-    NB! It's subject to change!"""
-
-    response = requests_get(url=FLIPSIDE_ENDPOINT, timeout=15)
-    response.raise_for_status()
-    return response.json()
 
 
 def get_block_info(block: BlockIdentifier) -> BlockData:

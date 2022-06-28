@@ -1,13 +1,13 @@
 ### AAVE collaterals monitoring bot
 
-Parse borrowers data from AAVE protocol and calculate risks distribution 
+Parse borrowers data from AAVE protocol and calculate risks distribution
 based on collateral to loan ratio, see zones definition below.
 
 #### Zones definition
 
 Risk zones defined as a ranges of collateral to loan ration
 
-##### Bin 1 
+##### Bin 1
 
 AAVE users with >=80% collaterals - stETH and  >=80% debt - ETH
 
@@ -58,11 +58,10 @@ All the others AAVE users with stETH collateral
 Configure bot via the following environment variables:
 
 - `NODE_ENDPOINT` is ETH1 endpoint
-- `FLIPSIDE_ENDPOINT` is used to fetch indexed data from Flipside (subject to change)
 - `PARSE_INTERVAL` is a delay in seconds between API fetches
 - `EXPORTER_PORT` is the port to expose metrics on
 - `LOG_FORMAT` is one of {"simple", "json"}
 
 #### Visualisation
 
-Sandbox available at the moment [here](https://grafana.testnet.fi/d/-QOYQiY7z/aave-bot?orgId=2).
+Dashboard available [here](https://grafana-automation.lido.fi/d/wYiKGhynz/aave-bot?orgId=1).
