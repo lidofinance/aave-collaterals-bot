@@ -1,3 +1,18 @@
+# [1.6.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.5.0...1.6.0) (2022-06-29)
+
+
+### Bug Fixes
+
+* use the given block for calculations ([6f7100b](https://github.com/lidofinance/aave-collaterals-bot/commit/6f7100b2d9e225a7c77af41b70997d4339638bcf))
+
+
+### Features
+
+* **parsing:** add transfer events actors to the list of holders ([f4a6d95](https://github.com/lidofinance/aave-collaterals-bot/commit/f4a6d95001939452071ca727cb2b0974f8350060))
+* **parsing:** fetch astETH holders from the blockchain ([0f30cfb](https://github.com/lidofinance/aave-collaterals-bot/commit/0f30cfb2de02e90eb5d435a655f72708e8674e62))
+
+
+
 # [1.5.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.4.1...1.5.0) (2022-06-28)
 
 
