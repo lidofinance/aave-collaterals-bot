@@ -3,22 +3,22 @@ groups:
   - name: aaveBotStatus
     rules:
 
-      - alert: TooLowUpdates
-        expr: changes(aave_bot_collateral_percentage{zone=~"C|D"}[1h]) < 6
-        for: 30m
-        labels:
-          stage: testing
-          severity: warning
-        annotations:
-          summary: Too low AAVE bot's updates count has been detected!
-
       - alert: ProcessRestarted
         expr: changes(process_start_time_seconds{job="collaterals"}[15m]) >= 3
         labels:
-          stage: testing
-          severity: warning
+          severity: critical
         annotations:
           summary: Too much AAVE bot restarts
-          description: The AAVE bot has been restarted for {{ $value }} times for the last 15 minutes
+          description: >-
+            The AAVE bot has been restarted for {{ $value }} times
+            for the last 15 minutes
+
+      - alert: StaleBotReport  # 3 hours because of long intervals
+        expr: time() - aave_bot_processing_finished_seconds > 3600 * 3
+        labels:
+          severity: high
+        annotations:
+          summary: Stale bot report detected
+          description: Last update was {{ $value | humanizeDuration }} ago
 
 # vim: set ts=2 sw=2 ft=yaml:
