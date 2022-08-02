@@ -11,6 +11,10 @@ COLLATERALS_ZONES_PERCENT = Gauge(
     "AAVE collaterals percentage distribution",
     ("zone", "bin"),
 )
+PROCESSING_COMPLETED = Gauge(
+    f"{PREFIX}_processing_finished_seconds",
+    "Last one successful parsing cycle completion timestamp",
+)
 FETCH_DURATION = Gauge(
     f"{PREFIX}_fetch_duration",
     "Protocol fetching duration",
