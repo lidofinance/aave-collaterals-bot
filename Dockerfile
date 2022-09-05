@@ -1,4 +1,4 @@
-FROM python:3.10-slim as base
+FROM python:3.10.6-slim as base
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
@@ -12,6 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_VERSION=1.2.0 \
     POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1 \
@@ -32,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 RUN curl -sSL https://install.python-poetry.org | python -
 
 COPY ./pyproject.toml ./poetry.lock ./
-RUN poetry install --no-dev
+RUN poetry install --only main
 
 
 FROM base as prod
@@ -45,6 +46,7 @@ RUN chown -R python:python .
 
 COPY --chown=python:python --from=deps $VENV_PATH $VENV_PATH
 COPY --chown=python:python ./src .
+COPY --chown=python:python build-info.json .
 
 USER python
 HEALTHCHECK --interval=10s --timeout=3s CMD sh -c "curl -f http://localhost:${EXPORTER_PORT:-8080}/healthcheck || exit 1"
