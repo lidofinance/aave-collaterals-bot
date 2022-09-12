@@ -11,6 +11,7 @@ services:
       EXPORTER_PORT:
       PARSE_INTERVAL:
       LOG_FORMAT:
+      LOG_LEVEL:
     restart: unless-stopped
 
   prometheus:
