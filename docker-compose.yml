@@ -2,7 +2,7 @@
 version: "3"
 
 services:
-  aave_bot:
+  bot:
     build:
       context: .
     command: "main.py"
@@ -13,6 +13,14 @@ services:
       LOG_FORMAT:
       LOG_LEVEL:
     restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:8.4.6
+    restart: unless-stopped
+    volumes:
+      - ./grafana:/etc/grafana/provisioning
+    ports:
+      - 3000:3000
 
   prometheus:
     image: prom/prometheus

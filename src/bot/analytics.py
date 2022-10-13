@@ -123,7 +123,7 @@ def calculate_values(data: pd.DataFrame, block: BlockIdentifier) -> Iterable[dic
         for label in RISK_LABELS:
             value: float = 0
             with suppress(KeyError):
-                value = risk_distr.at[label, "percent"]
+                value = risk_distr.at[label, "stETH"]
             values[label] = value
 
         result.append(values)

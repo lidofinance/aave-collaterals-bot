@@ -2,9 +2,17 @@
 groups:
   - name: aaveBot
     rules:
+      - record: aave_bot_collaterals:total
+        expr: sum (aave_bot_collaterals) by (bin)
+
+      - record: aave_bot_collaterals:risky
+        expr: sum (aave_bot_collaterals{zone=~"C|D|liquidation"}) by (bin)
+
+      - record: aave_bot_collaterals:risky:percent
+        expr: aave_bot_collaterals:risky / aave_bot_collaterals:total
 
       - alert: HighAmountCollateralsUnderRisk
-        expr: sum (aave_bot_collateral_percentage{zone=~"C|D|liquidation"}) by (bin) > 15.0
+        expr: aave_bot_collaterals:risky:percent > 0.15
         for: 30m
         labels:
           severity: high
@@ -21,11 +29,14 @@ groups:
             > AAVE users with less significant stETH collateral amount
             {{- end }}
 
-            It is {{ $value | printf "%.1f" }}% of bin {{ .Labels.bin }} in risky zone!
+            It is {{ $value | humanizePercentage }} ({{
+              with printf "aave_bot_collaterals:risky{bin=%q}" .Labels.bin | query
+            }}{{ . | first | value | printf "%.1f" }} stETH{{ end }})
+            of bin {{ .Labels.bin }} in risky zone!
 
 
       - alert: AAVECollateralsLiquidation
-        expr: aave_bot_collateral_percentage{zone="liquidation"} > 0
+        expr: aave_bot_collaterals{zone="liquidation"} > 0
         labels:
           severity: high
         annotations:

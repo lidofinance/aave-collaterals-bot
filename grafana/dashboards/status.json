@@ -33,7 +33,7 @@
       "title": "Business metrics",
       "tooltip": "",
       "type": "link",
-      "url": "https://grafana-automation.lido.fi/d/wYiKGhynz/aave-bot?orgId=1"
+      "url": "https://grafana-automation.lido.fi/d/wYiKGhynz/aave-bot"
     },
     {
       "asDropdown": true,
