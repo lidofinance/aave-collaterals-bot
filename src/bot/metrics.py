@@ -13,9 +13,9 @@ BUILD_INFO_PATH = "build-info.json"
 
 PREFIX = "aave_bot"
 
-COLLATERALS_ZONES_PERCENT = Gauge(
-    f"{PREFIX}_collateral_percentage",
-    "AAVE collaterals percentage distribution",
+COLLATERALS = Gauge(
+    f"{PREFIX}_collaterals",
+    "AAVE collaterals distribution",
     ("zone", "bin"),
 )
 PROCESSING_COMPLETED = Gauge(

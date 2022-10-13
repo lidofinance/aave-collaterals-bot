@@ -20,25 +20,23 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "gnetId": null,
   "graphTooltip": 0,
-  "id": 44,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": "Prometheus AAVE",
       "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 2,
           "mappings": [],
-          "max": 100,
+          "max": 1,
           "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -49,7 +47,8 @@
                 "value": 15
               }
             ]
-          }
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -64,7 +63,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
@@ -73,32 +72,36 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.2.2",
+      "pluginVersion": "8.4.6",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "sum(aave_bot_collateral_percentage{bin=\"1\", zone=~\"C|D|liquidation\"})",
+          "expr": "aave_bot_collaterals:risky:percent{bin=\"1\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "🥇 BIN 1 risks %",
+      "title": "🥇 BIN 1 risks",
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus AAVE",
       "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 2,
           "mappings": [],
-          "max": 100,
+          "max": 1,
           "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -109,7 +112,8 @@
                 "value": 15
               }
             ]
-          }
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -124,7 +128,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
@@ -133,32 +137,36 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.2.2",
+      "pluginVersion": "8.4.6",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "sum(aave_bot_collateral_percentage{bin=\"2\", zone=~\"C|D|liquidation\"})",
+          "expr": "aave_bot_collaterals:risky:percent{bin=\"2\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "🥈 BIN 2 risks %",
+      "title": "🥈 BIN 2 risks",
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus AAVE",
       "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 2,
           "mappings": [],
-          "max": 100,
+          "max": 1,
           "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -169,7 +177,8 @@
                 "value": 15
               }
             ]
-          }
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -184,7 +193,7 @@
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
@@ -193,26 +202,29 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.2.2",
+      "pluginVersion": "8.4.6",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "sum(aave_bot_collateral_percentage{bin=\"3\", zone=~\"C|D|liquidation\"})",
+          "expr": "aave_bot_collaterals:risky:percent{bin=\"3\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "🥉 BIN 3 risks %",
+      "title": "🥉 BIN 3 risks",
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus AAVE",
       "description": "AAVE users with >=80% collaterals - stETH and  >=80% debt - ETH",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "custom": {
             "axisLabel": "",
@@ -244,10 +256,10 @@
           },
           "decimals": 0,
           "mappings": [],
-          "max": 60,
+          "max": 0.6,
           "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -259,7 +271,7 @@
               }
             ]
           },
-          "unit": "percent"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -277,13 +289,18 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "sum(aave_bot_collateral_percentage{bin=\"1\", zone=~\"C|D|liquidation\"})",
+          "expr": "aave_bot_collaterals:risky:percent{bin=\"1\"}",
           "interval": "",
           "legendFormat": "C+D+liquidation",
           "refId": "A"
@@ -293,7 +310,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus AAVE",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -329,7 +345,7 @@
           },
           "mappings": [],
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -340,7 +356,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -358,13 +375,18 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "aave_bot_collateral_percentage{bin=\"1\"}",
+          "expr": "aave_bot_collaterals{bin=\"1\"} / on (bin) group_left aave_bot_collaterals:total",
           "interval": "",
           "legendFormat": "{{zone}}",
           "refId": "A"
@@ -374,12 +396,11 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus AAVE",
       "description": "AAVE users with stETH collateral and >=80% debt - not ETH",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "custom": {
             "axisLabel": "",
@@ -410,10 +431,10 @@
             }
           },
           "mappings": [],
-          "max": 60,
+          "max": 0.6,
           "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -425,7 +446,7 @@
               }
             ]
           },
-          "unit": "percent"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -443,13 +464,18 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "sum(aave_bot_collateral_percentage{bin=\"2\", zone=~\"C|D|liquidation\"})",
+          "expr": "aave_bot_collaterals:risky:percent{bin=\"2\"}",
           "interval": "",
           "legendFormat": "C+D+liquidation",
           "refId": "A"
@@ -459,7 +485,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus AAVE",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -495,7 +520,7 @@
           },
           "mappings": [],
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -506,7 +531,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -516,7 +542,7 @@
         "x": 12,
         "y": 17
       },
-      "id": 7,
+      "id": 14,
       "options": {
         "legend": {
           "calcs": [],
@@ -524,13 +550,18 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "aave_bot_collateral_percentage{bin=\"2\"}",
+          "expr": "aave_bot_collaterals{bin=\"2\"} / on (bin) group_left aave_bot_collaterals:total",
           "interval": "",
           "legendFormat": "{{zone}}",
           "refId": "A"
@@ -540,12 +571,11 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus AAVE",
       "description": "All the others AAVE users with stETH collateral",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "custom": {
             "axisLabel": "",
@@ -576,10 +606,10 @@
             }
           },
           "mappings": [],
-          "max": 60,
+          "max": 0.6,
           "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -591,7 +621,7 @@
               }
             ]
           },
-          "unit": "percent"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -609,13 +639,18 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "sum(aave_bot_collateral_percentage{bin=\"3\", zone=~\"C|D|liquidation\"})",
+          "expr": "aave_bot_collaterals:risky:percent{bin=\"3\"}",
           "interval": "",
           "legendFormat": "C+D+liquidation",
           "refId": "A"
@@ -625,7 +660,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus AAVE",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -661,7 +695,7 @@
           },
           "mappings": [],
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -672,7 +706,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -682,7 +717,7 @@
         "x": 12,
         "y": 26
       },
-      "id": 9,
+      "id": 15,
       "options": {
         "legend": {
           "calcs": [],
@@ -690,13 +725,18 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
           "exemplar": true,
-          "expr": "aave_bot_collateral_percentage{bin=\"3\"}",
+          "expr": "aave_bot_collaterals{bin=\"3\"} / on (bin) group_left aave_bot_collaterals:total",
           "interval": "",
           "legendFormat": "{{zone}}",
           "refId": "A"
@@ -707,7 +747,7 @@
     }
   ],
   "refresh": "5m",
-  "schemaVersion": 31,
+  "schemaVersion": 35,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -721,5 +761,6 @@
   "timezone": "",
   "title": "AAVE bot",
   "uid": "wYiKGhynz",
-  "version": 8
+  "version": 1,
+  "weekStart": ""
 }

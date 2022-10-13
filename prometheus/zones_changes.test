@@ -1,16 +1,24 @@
 ---
-rule_files: 
+rule_files:
   - "zones_changes.rule"
 evaluation_interval: 1m
 tests:
   # HighAmountCollateralsUnderRisk
-  - interval: 5m 
+  - interval: 5m
     input_series:
-      - series: aave_bot_collateral_percentage{zone="D", bin="1"}
+      - series: aave_bot_collaterals{zone="OTHER", bin="1"}
+        values: 80+0x10
+      - series: aave_bot_collaterals{zone="D", bin="1"}
         values: 20+0x10
-      - series: aave_bot_collateral_percentage{zone="D", bin="2"}
+
+      - series: aave_bot_collaterals{zone="OTHER", bin="2"}
+        values: 83+0x10
+      - series: aave_bot_collaterals{zone="D", bin="2"}
         values: 17+0x10
-      - series: aave_bot_collateral_percentage{zone="D", bin="3"}
+
+      - series: aave_bot_collaterals{zone="OTHER", bin="3"}
+        values: 90+0x10
+      - series: aave_bot_collaterals{zone="D", bin="3"}
         values: 10+0x10
     alert_rule_test:
       # no fire
@@ -29,7 +37,7 @@ tests:
               description: >-
                 > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
 
-                It is 20.0% of bin 1 in risky zone!
+                It is 20% (20.0 stETH) of bin 1 in risky zone!
           # Bin 2
           - exp_labels:
               severity: high
@@ -39,20 +47,20 @@ tests:
               description: >-
                 > AAVE users with stETH collateral and >=80% debt not in ETH
 
-                It is 17.0% of bin 2 in risky zone!
+                It is 17% (17.0 stETH) of bin 2 in risky zone!
 
   # AAVECollateralsLiquidation
-  - interval: 5m 
+  - interval: 5m
     input_series:
-      - series: aave_bot_collateral_percentage{zone="liquidation", bin="1"}
+      - series: aave_bot_collaterals{zone="liquidation", bin="1"}
         values: 0.01+0x10
-      - series: aave_bot_collateral_percentage{zone="liquidation", bin="2"}
+      - series: aave_bot_collaterals{zone="liquidation", bin="2"}
         values: 0.01+0x10
-      - series: aave_bot_collateral_percentage{zone="liquidation", bin="3"}
+      - series: aave_bot_collaterals{zone="liquidation", bin="3"}
         values: 0+0x10
     alert_rule_test:
       - eval_time: 5m
-        alertname: AAVECollateralsLiquidation 
+        alertname: AAVECollateralsLiquidation
         exp_alerts:
           # Bin 1
           - exp_labels:
