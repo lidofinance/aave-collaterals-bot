@@ -6,7 +6,7 @@ alerting:
   alertmanagers:
     - static_configs:
         - targets:
-          - alertmanager:9093
+            - alertmanager:9093
 
 rule_files:
   - "zones_changes.rule"
@@ -18,6 +18,5 @@ scrape_configs:
 
   - job_name: "collaterals"
     static_configs:
-      - targets: ["aave_bot:8080"]
-
+      - targets: ["bot:8080"]
 # vim: set ts=2 sw=2:

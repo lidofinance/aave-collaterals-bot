@@ -6,6 +6,7 @@ jobs:
   python:
     uses: lidofinance/linters/.github/workflows/python.yml@master
     with:
+      python-version: 3.10.6
       dirs: src
   security:
     uses: lidofinance/linters/.github/workflows/security.yml@master

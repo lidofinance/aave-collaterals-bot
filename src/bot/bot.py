@@ -10,7 +10,7 @@ from web3.types import BlockIdentifier
 from .aaveparser import parse
 from .analytics import calculate_values
 from .config import PARSE_INTERVAL
-from .metrics import APP_ERRORS, COLLATERALS_ZONES_PERCENT, FETCH_DURATION
+from .metrics import APP_ERRORS, COLLATERALS, FETCH_DURATION, PROCESSING_COMPLETED
 
 
 class AAVEBot:  # pylint: disable=too-few-public-methods
@@ -25,8 +25,9 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
         with APP_ERRORS.labels("calculations").count_exceptions():
             values = calculate_values(data, block)
         for bin, stat in enumerate(values):  # pylint: disable=redefined-builtin
-            for zone, percent in stat.items():
-                COLLATERALS_ZONES_PERCENT.labels(zone, bin + 1).set(percent)
+            for zone, value in stat.items():
+                COLLATERALS.labels(zone, bin + 1).set(value)
+        PROCESSING_COMPLETED.set_to_current_time()
         self.log.debug("Metrics has been updated\n%s", self.pprint.pformat(values))
         self.log.info("Fetching complete")
 
