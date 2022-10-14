@@ -1,3 +1,27 @@
+# [1.7.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.6.0...1.7.0) (2022-10-14)
+
+
+### Bug Fixes
+
+* passthrough log level ([0b96ce2](https://github.com/lidofinance/aave-collaterals-bot/commit/0b96ce2adfc26a8feaaf41ee24dd334578014547))
+* testnet deploy ([7bb2ccd](https://github.com/lidofinance/aave-collaterals-bot/commit/7bb2ccdd716067560d0872959b019839263b499d))
+* update curl version ([49b5d54](https://github.com/lidofinance/aave-collaterals-bot/commit/49b5d54efc9eb320382906a3589ce1004904da0d))
+* update Dockerfile for the latest Debian ([1ef7ff6](https://github.com/lidofinance/aave-collaterals-bot/commit/1ef7ff6dc32fb59f1a439b918db80cd3910e6bf5))
+* use the given block for calculations ([87e467a](https://github.com/lidofinance/aave-collaterals-bot/commit/87e467a36191598c3c0ca19fcf5a73338f441556))
+
+
+### Features
+
+* expose collaterals value ([f88f1af](https://github.com/lidofinance/aave-collaterals-bot/commit/f88f1af97ab0296db01e847e79985cee10d702a6))
+* **grafana:** update status dashboard ([bfced6c](https://github.com/lidofinance/aave-collaterals-bot/commit/bfced6c4a2e5a964393406905d527fc8773a9efc))
+* **metrics:** add metric for cycle finish timestamp ([459b7ad](https://github.com/lidofinance/aave-collaterals-bot/commit/459b7adc379dd48b6ece778d97156d99db4eeae0))
+* **metrics:** update status rules ([449c6f0](https://github.com/lidofinance/aave-collaterals-bot/commit/449c6f08358c416f6f0e98eb3419cd226791c237))
+* parse `build-info.json` file ([97b7513](https://github.com/lidofinance/aave-collaterals-bot/commit/97b75132f04badaee18e9a0eab109da69c057185))
+* **parsing:** add transfer events actors to the list of holders ([0a4d0de](https://github.com/lidofinance/aave-collaterals-bot/commit/0a4d0dec785b5573b3053e85761a22401e5c6e47))
+* **parsing:** fetch astETH holders from the blockchain ([3d81bf8](https://github.com/lidofinance/aave-collaterals-bot/commit/3d81bf87f561b6ff8637afe0610526953d2b274b))
+
+
+
 # [1.6.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.5.0...1.6.0) (2022-06-29)
 
 
