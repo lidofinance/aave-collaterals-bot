@@ -92,7 +92,7 @@ def fetch_asteth_holders(start_block: int, last_block: int) -> list[dict]:
     res = []
 
     log.info("Fetching astETH holders within the blocks range %d,%d", start_block, last_block)
-    batch_size = 100000
+    batch_size = 100_000
     block = start_block
     while block <= last_block:
         args = {

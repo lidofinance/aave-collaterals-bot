@@ -8,8 +8,10 @@ services:
     command: "main.py"
     environment:
       NODE_ENDPOINT:
+      FALLBACK_NODE_ENDPOINT:
       EXPORTER_PORT:
       PARSE_INTERVAL:
+      MAIN_ERROR_COOLDOWN:
       LOG_FORMAT:
       LOG_LEVEL:
     restart: unless-stopped

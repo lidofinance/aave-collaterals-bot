@@ -66,5 +66,7 @@ if "wss://" in NODE_ENDPOINT:
 
 # === Optional ===
 
+FALLBACK_NODE_ENDPOINT = getenv("FALLBACK_NODE_ENDPOINT", str, default="")
+MAIN_ERROR_COOLDOWN = getenv("MAIN_ERROR_COOLDOWN", int, default=15)
 PARSE_INTERVAL = getenv("PARSE_INTERVAL", int, default=2700)
 EXPORTER_PORT = getenv("EXPORTER_PORT", int, default=8080)
