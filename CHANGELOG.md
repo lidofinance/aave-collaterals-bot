@@ -1,3 +1,12 @@
+## [1.7.1](https://github.com/lidofinance/aave-collaterals-bot/compare/1.7.0...1.7.1) (2023-01-13)
+
+
+### Bug Fixes
+
+* add fallback for eth provider ([0be7534](https://github.com/lidofinance/aave-collaterals-bot/commit/0be7534ad32d4f70cd8b86c3628b1256219714b1))
+
+
+
 # [1.7.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.6.0...1.7.0) (2022-10-14)
 
 
@@ -91,6 +100,14 @@
 ### Features
 
 * **metrics:** instrumenting app ([6a09ecd](https://github.com/lidofinance/aave-collaterals-bot/commit/6a09ecda317b004c32e8c8955e568b7f88efec80))
+
+
+
+# [1.2.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.1.0...1.2.0) (2022-05-23)
+
+
+### Features
+
 * update configs and improve logging ([127ccfc](https://github.com/lidofinance/aave-collaterals-bot/commit/127ccfcc6173cfabdc3e80aae5f306d609a268e0))
 
 
