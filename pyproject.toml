@@ -17,6 +17,7 @@ pandas = "^1.4.1"
 unsync = "^1.4.0"
 numpy = "^1.22.3"
 python-json-logger = "^2.0.2"
+web3-multi-provider = "^0.4.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -26,7 +27,7 @@ isort = "^5.10.1"
 [tool.pylint.format]
 max-line-length = 120
 max-module-lines = 1000
-good-names = "i,j,f,df,ex,ts"
+good-names = "i,j,f,df,ex,ts,w3"
 
 [tool.black]
 line-length = 120
