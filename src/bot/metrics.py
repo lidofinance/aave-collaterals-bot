@@ -29,11 +29,12 @@ FETCH_DURATION = Gauge(
 ETH_RPC_REQUESTS = Counter(
     f"{PREFIX}_eth_rpc_requests",
     "Total count of requests to ETH1 RPC",
-    ("method", "code"),
+    ("provider", "method", "code"),
 )
 ETH_RPC_REQUESTS_DURATION = Histogram(
     f"{PREFIX}_eth_rpc_requests_duration",
     "Duration of requests to ETH1 RPC",
+    ("provider",),
 )
 APP_ERRORS = Counter(
     f"{PREFIX}_app_errors",
