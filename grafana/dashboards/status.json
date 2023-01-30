@@ -653,11 +653,11 @@
       "options": {
         "colorMode": "none",
         "graphMode": "none",
-        "justifyMode": "center",
+        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
@@ -666,20 +666,34 @@
           "titleSize": 16,
           "valueSize": 16
         },
-        "textMode": "value"
+        "textMode": "value_and_name"
       },
       "pluginVersion": "8.4.6",
       "targets": [
         {
           "datasource": null,
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(increase(aave_bot_eth_rpc_requests_total{env=~\"$env\",source=~\"$source\"}[$__range]))",
+          "expr": "sum(increase(aave_bot_eth_rpc_requests_total{env=~\"$env\",source=~\"$source\"}[$__range])) by (provider)",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "{{provider}}",
+          "range": true,
           "refId": "A"
         }
       ],
       "title": "ETH RPC requests count",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Value": "unknown"
+            }
+          }
+        }
+      ],
       "type": "stat"
     },
     {
@@ -692,7 +706,8 @@
       },
       "id": 10,
       "panels": [],
-      "title": "Requests",
+      "repeat": "provider",
+      "title": "Requests by $provider",
       "type": "row"
     },
     {
@@ -1933,6 +1948,23 @@
         "query": "",
         "skipUrlSync": false,
         "type": "textbox"
+      },
+      {
+        "definition": "label_values(aave_bot_eth_rpc_requests_total{env=~\"$env\",source=~\"$source\"}, provider)",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "provider",
+        "options": [],
+        "query": {
+          "query": "label_values(aave_bot_eth_rpc_requests_total{env=~\"$env\",source=~\"$source\"}, provider)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
