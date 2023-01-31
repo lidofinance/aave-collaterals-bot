@@ -6,6 +6,9 @@ on:
     paths:
       - "prometheus/**"
 
+permissions:
+  contents: read
+
 jobs:
   promtool:
     name: Checks via promtool
@@ -19,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       - name: Install prometheus
         run: |
