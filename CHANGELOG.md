@@ -1,3 +1,12 @@
+# [1.8.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.7.1...1.8.0) (2023-02-01)
+
+
+### Features
+
+* expose provider in metrics ([5a7c4a4](https://github.com/lidofinance/aave-collaterals-bot/commit/5a7c4a4dc44bf7a4599b877aadc21cabe7e9873d))
+
+
+
 ## [1.7.1](https://github.com/lidofinance/aave-collaterals-bot/compare/1.7.0...1.7.1) (2023-01-13)
 
 
