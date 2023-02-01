@@ -14,11 +14,27 @@ groups:
             for the last 15 minutes
 
       - alert: StaleBotReport  # 3 hours because of long intervals
-        expr: time() - aave_bot_processing_finished_seconds > 3600 * 3
+        expr: >
+          time() - aave_bot_processing_finished_seconds > 3600 * 3 and
+          aave_bot_processing_finished_seconds > 0
         labels:
           severity: high
         annotations:
           summary: Stale bot report detected
-          description: Last update was {{ $value | humanizeDuration }} ago
+          description: >-
+            Last report has been received more than 3 hours ago
+
+      - alert: StaleBotReportOnLaunch
+        expr: >
+          aave_bot_processing_finished_seconds == 0 or
+          absent(aave_bot_processing_finished_seconds)
+        for: 30m
+        labels:
+          severity: high
+        annotations:
+          summary: Stale bot report detected
+          description: >-
+            No report has been received in the last 30
+            minutes since the bot was launched
 
 # vim: set ts=2 sw=2 ft=yaml:
