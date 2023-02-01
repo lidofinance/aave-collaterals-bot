@@ -111,6 +111,7 @@
               "datasource": null,
               "exemplar": true,
               "expr": "aave_bot_build_info",
+              "expr": "aave_bot_build_info{env=~\"$env\",source=~\"$source\"}",
               "instant": false,
               "interval": "",
               "legendFormat": "",
@@ -177,7 +178,7 @@
             {
               "datasource": null,
               "exemplar": true,
-              "expr": "aave_bot_build_info",
+              "expr": "aave_bot_build_info{env=~\"$env\",source=~\"$source\"}",
               "instant": false,
               "interval": "",
               "legendFormat": "",
@@ -244,7 +245,7 @@
             {
               "datasource": null,
               "exemplar": true,
-              "expr": "aave_bot_build_info",
+              "expr": "aave_bot_build_info{env=~\"$env\",source=~\"$source\"}",
               "instant": false,
               "interval": "",
               "legendFormat": "",
@@ -315,7 +316,7 @@
             {
               "datasource": null,
               "exemplar": true,
-              "expr": "aave_bot_build_info",
+              "expr": "aave_bot_build_info{env=~\"$env\",source=~\"$source\"}",
               "instant": false,
               "interval": "",
               "legendFormat": "",
@@ -475,7 +476,7 @@
         {
           "datasource": null,
           "exemplar": false,
-          "expr": "time() - aave_bot_processing_finished_seconds",
+          "expr": "time() - aave_bot_processing_finished_seconds{env=~\"$env\",source=~\"$source\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -927,6 +928,7 @@
                 "uid": "ZqYp0BH7k"
               },
               "expr": "{container_name=\"$container\",env=~\"$env\",source=~\"$source\"} | json |= \"ERROR\" | line_format \"[{{.levelname}}] {{.message}}\" |~ \"$search\"",
+              "queryType": "range",
               "refId": "A"
             }
           ],
