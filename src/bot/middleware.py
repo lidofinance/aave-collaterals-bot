@@ -3,12 +3,12 @@
 # pylint: disable=unused-argument,invalid-name,unused-import
 
 import logging
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from eth_typing import URI  # type: ignore
 from requests import HTTPError, Response
 from retry.api import retry_call
-from web3 import Web3
+from web3 import HTTPProvider, Web3
 from web3.types import RPCEndpoint, RPCResponse
 
 from .consts import HTTP_REQUESTS_DELAY, HTTP_REQUESTS_RETRY
@@ -100,12 +100,16 @@ def construct_fallback_provider_middleware(w3: Web3, fallback: URI) -> Callable:
         return middleware
 
     def switch_to_main() -> None:
-        w3.provider.endpoint_uri = main_endpoint  # type: ignore
-        log.debug("Switched to main provider")
+        w3.provider = cast(HTTPProvider, w3.provider)
+        if w3.provider.endpoint_uri != main_endpoint:
+            w3.provider.endpoint_uri = main_endpoint
+            log.debug("Switched to main provider")
 
     def switch_to_fallback() -> None:
-        w3.provider.endpoint_uri = fallback  # type: ignore
-        log.debug("Switched to fallback provider")
+        w3.provider = cast(HTTPProvider, w3.provider)
+        if w3.provider.endpoint_uri != fallback:
+            w3.provider.endpoint_uri = fallback
+            log.debug("Switched to fallback provider")
 
     return fallback_provider
 
