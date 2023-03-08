@@ -1,6 +1,7 @@
 """Some constants"""
 
 DECIMALS_HEALTHF = 18
+ETH_DECIMALS = 18
 
 MS_3_MIN = 3 * 60 * 1000
 

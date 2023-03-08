@@ -12,7 +12,7 @@ from web3.exceptions import ContractLogicError
 from web3.types import BlockIdentifier
 
 from . import abi
-from .consts import DECIMALS_HEALTHF
+from .consts import DECIMALS_HEALTHF, ETH_DECIMALS
 from .eth import get_contract, w3
 
 
@@ -98,7 +98,7 @@ class Oracle(IsContract):
             base_unit_precision = self.contract.functions.BASE_CURRENCY_UNIT().call()
             return int(math.log(base_unit_precision, 10))
         except ContractLogicError:
-            return 18  # defaults to ETH-based
+            return ETH_DECIMALS  # defaults to ETH-based
 
     @cached_property
     def precision(self) -> int:
@@ -193,7 +193,7 @@ class PoolPosition:
         """Get position name"""
         return f"{self.supply_token.symbol}-{self.debt_token.symbol}"
 
-    def get_total_supply(self, user: str, block: BlockIdentifier) -> int:
+    def get_total_supply(self, user: str, block: BlockIdentifier) -> float:
         """Get user total supplied amount of the collateral token"""
         a_token = self.supply_token.a_token
         user = w3.toChecksumAddress(user)

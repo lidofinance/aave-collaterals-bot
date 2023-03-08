@@ -8,6 +8,7 @@ import pandas as pd
 from unsync import unsync
 from web3.types import BlockData, BlockIdentifier
 
+from .config import TRANSFER_EVENTS_BATCH
 from .eth import w3
 from .structs import Context, PoolPosition, UserInfo
 
@@ -54,18 +55,17 @@ def find_new_atoken_holders(ctx: Context, pair: PoolPosition) -> None:
         ctx.init_block,
         ctx.curr_block,
     )
-    batch_size = 10_000  # 10k blocks per batch is compatible with the most of the providers
     block = ctx.init_block
     while block <= ctx.curr_block:
         args = {
             "fromBlock": block,
-            "toBlock": block + batch_size,
+            "toBlock": block + TRANSFER_EVENTS_BATCH,
         }
         events = pair.supply_token.a_token.events.Transfer.getLogs(**args)
         for event in events:
             ctx.holders.add(event["args"]["from"])
             ctx.holders.add(event["args"]["to"])
-        block += batch_size
+        block += TRANSFER_EVENTS_BATCH
 
 
 def get_holders_balances(ctx: Context, pair: PoolPosition) -> Iterable[tuple[str, float]]:
