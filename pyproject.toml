@@ -22,11 +22,12 @@ python-json-logger = "^2.0.2"
 black = "^22.3.0"
 pylint = "^2.13.5"
 isort = "^5.10.1"
+mypy = "^1.0.1"
 
 [tool.pylint.format]
 max-line-length = 120
 max-module-lines = 1000
-good-names = "i,j,f,df,ex,ts,w3"
+good-names = "i,j,f,r,v,w,df,ex,ts,w3"
 
 [tool.black]
 line-length = 120
@@ -43,3 +44,6 @@ exclude = '''
 [tool.isort]
 profile = "black"
 line_length = 120
+
+[tool.mypy]
+ignore_missing_imports = true

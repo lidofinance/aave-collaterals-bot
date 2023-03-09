@@ -54,7 +54,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 0
       },
@@ -80,7 +80,7 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals:risky:percent{bin=\"1\"}",
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"1\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -119,8 +119,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
       "id": 12,
@@ -145,13 +145,13 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals:risky:percent{bin=\"2\"}",
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"2\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "🥈 BIN 2 risks",
+      "title": "🥇 BIN 2 risks",
       "type": "gauge"
     },
     {
@@ -184,8 +184,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 12,
         "y": 0
       },
       "id": 13,
@@ -210,17 +210,82 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals:risky:percent{bin=\"3\"}",
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"3\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "🥉 BIN 3 risks",
+      "title": "🥈 BIN 3 risks",
       "type": "gauge"
     },
     {
-      "description": "AAVE users with >=80% collaterals - stETH and  >=80% debt - ETH",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 18,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.4.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
+          "exemplar": true,
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"4\"}",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "🥉 BIN 4 risks",
+      "type": "gauge"
+    },
+    {
+      "description": "Users with e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -300,7 +365,7 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals:risky:percent{bin=\"1\"}",
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"1\"}",
           "interval": "",
           "legendFormat": "C+D+liquidation",
           "refId": "A"
@@ -386,7 +451,7 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals{bin=\"1\"} / on (bin) group_left aave_bot_collaterals:total",
+          "expr": "aave_bot_collaterals{pair=\"wstETH-WETH\",bin=\"1\"} / on (pair,bin) group_left aave_bot_collaterals:total",
           "interval": "",
           "legendFormat": "{{zone}}",
           "refId": "A"
@@ -396,7 +461,7 @@
       "type": "timeseries"
     },
     {
-      "description": "AAVE users with stETH collateral and >=80% debt - not ETH",
+      "description": "Users without e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -475,13 +540,13 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals:risky:percent{bin=\"2\"}",
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"2\"}",
           "interval": "",
           "legendFormat": "C+D+liquidation",
           "refId": "A"
         }
       ],
-      "title": "🥈 AAVE risks BIN 2",
+      "title": "🥇 AAVE risks BIN 2",
       "type": "timeseries"
     },
     {
@@ -561,7 +626,7 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals{bin=\"2\"} / on (bin) group_left aave_bot_collaterals:total",
+          "expr": "aave_bot_collaterals{pair=\"wstETH-WETH\",bin=\"2\"} / on (pair,bin) group_left aave_bot_collaterals:total",
           "interval": "",
           "legendFormat": "{{zone}}",
           "refId": "A"
@@ -571,7 +636,7 @@
       "type": "timeseries"
     },
     {
-      "description": "All the others AAVE users with stETH collateral",
+      "description": "Users with wstETH collateral and >=80% debt - not ETH",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -650,13 +715,13 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals:risky:percent{bin=\"3\"}",
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"3\"}",
           "interval": "",
           "legendFormat": "C+D+liquidation",
           "refId": "A"
         }
       ],
-      "title": "🥉 AAVE risks BIN 3",
+      "title": "🥈 AAVE risks BIN 3",
       "type": "timeseries"
     },
     {
@@ -736,13 +801,188 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals{bin=\"3\"} / on (bin) group_left aave_bot_collaterals:total",
+          "expr": "aave_bot_collaterals{pair=\"wstETH-WETH\",bin=\"3\"} / on (pair,bin) group_left aave_bot_collaterals:total",
           "interval": "",
           "legendFormat": "{{zone}}",
           "refId": "A"
         }
       ],
       "title": "Bin 3 zones overview",
+      "type": "timeseries"
+    },
+    {
+      "description": "All other AAVE users with wstETH collateral",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
+            }
+          },
+          "mappings": [],
+          "max": 0.6,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 35
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
+          "exemplar": true,
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"wstETH-WETH\",bin=\"4\"}",
+          "interval": "",
+          "legendFormat": "C+D+liquidation",
+          "refId": "A"
+        }
+      ],
+      "title": "🥉 AAVE risks BIN 4",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 35
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
+          "exemplar": true,
+          "expr": "aave_bot_collaterals{pair=\"wstETH-WETH\",bin=\"4\"} / on (pair,bin) group_left aave_bot_collaterals:total",
+          "interval": "",
+          "legendFormat": "{{zone}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Bin 4 zones overview",
       "type": "timeseries"
     }
   ],
@@ -759,8 +999,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "AAVE bot",
-  "uid": "wYiKGhynz",
+  "title": "AAVE awstETH risks",
+  "uid": "SoKLCf9A",
   "version": 1,
   "weekStart": ""
 }

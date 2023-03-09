@@ -6,19 +6,19 @@ tests:
   # HighAmountCollateralsUnderRisk
   - interval: 5m
     input_series:
-      - series: aave_bot_collaterals{zone="OTHER", bin="1"}
+      - series: aave_bot_collaterals{zone="OTHER", bin="1", pair="stETH-WETH"}
         values: 80+0x10
-      - series: aave_bot_collaterals{zone="D", bin="1"}
+      - series: aave_bot_collaterals{zone="D", bin="1", pair="stETH-WETH"}
         values: 20+0x10
 
-      - series: aave_bot_collaterals{zone="OTHER", bin="2"}
+      - series: aave_bot_collaterals{zone="OTHER", bin="2", pair="stETH-WETH"}
         values: 83+0x10
-      - series: aave_bot_collaterals{zone="D", bin="2"}
+      - series: aave_bot_collaterals{zone="D", bin="2", pair="stETH-WETH"}
         values: 17+0x10
 
-      - series: aave_bot_collaterals{zone="OTHER", bin="3"}
+      - series: aave_bot_collaterals{zone="OTHER", bin="3", pair="stETH-WETH"}
         values: 90+0x10
-      - series: aave_bot_collaterals{zone="D", bin="3"}
+      - series: aave_bot_collaterals{zone="D", bin="3", pair="stETH-WETH"}
         values: 10+0x10
     alert_rule_test:
       # no fire
@@ -30,20 +30,22 @@ tests:
         exp_alerts:
           # Bin 1
           - exp_labels:
+              pair: stETH-WETH
               severity: high
               bin: 1
             exp_annotations:
-              summary: High percent of AAVE bin 1 collaterals in dangerous zone 🔥
+              summary: High percent of AAVE stETH-WETH bin 1 collaterals in dangerous zone 🔥
               description: >-
                 > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
 
                 It is 20% (20.0 stETH) of bin 1 in risky zone!
           # Bin 2
           - exp_labels:
+              pair: stETH-WETH
               severity: high
               bin: 2
             exp_annotations:
-              summary: High percent of AAVE bin 2 collaterals in dangerous zone 🔥
+              summary: High percent of AAVE stETH-WETH bin 2 collaterals in dangerous zone 🔥
               description: >-
                 > AAVE users with stETH collateral and >=80% debt not in ETH
 
@@ -52,11 +54,11 @@ tests:
   # AAVECollateralsLiquidation
   - interval: 5m
     input_series:
-      - series: aave_bot_collaterals{zone="liquidation", bin="1"}
+      - series: aave_bot_collaterals{zone="liquidation", bin="1", pair="stETH-WETH"}
         values: 0.01+0x10
-      - series: aave_bot_collaterals{zone="liquidation", bin="2"}
+      - series: aave_bot_collaterals{zone="liquidation", bin="2", pair="stETH-WETH"}
         values: 0.01+0x10
-      - series: aave_bot_collaterals{zone="liquidation", bin="3"}
+      - series: aave_bot_collaterals{zone="liquidation", bin="3", pair="stETH-WETH"}
         values: 0+0x10
     alert_rule_test:
       - eval_time: 5m
@@ -67,8 +69,9 @@ tests:
               severity: high
               zone: liquidation
               bin: 1
+              pair: stETH-WETH
             exp_annotations:
-              summary: AAVE bin 1 collaterals under liquidation has been detected!
+              summary: AAVE stETH-WETH bin 1 collaterals under liquidation has been detected!
               description: >-
                 > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
           # Bin 2
@@ -76,8 +79,9 @@ tests:
               severity: high
               zone: liquidation
               bin: 2
+              pair: stETH-WETH
             exp_annotations:
-              summary: AAVE bin 2 collaterals under liquidation has been detected!
+              summary: AAVE stETH-WETH bin 2 collaterals under liquidation has been detected!
               description: >-
                 > AAVE users with stETH collateral and >=80% debt not in ETH
 
