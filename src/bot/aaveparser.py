@@ -1,171 +1,146 @@
-"""Module for parsing data from Anchor protocol contracts"""
+"""Module for parsing data from AAVE protocol contracts"""
 
 import logging
-from dataclasses import dataclass
+from collections.abc import Iterable
+from typing import TypeAlias
 
 import pandas as pd
-from eth_typing.encoding import HexStr
 from unsync import unsync
 from web3.types import BlockData, BlockIdentifier
 
-from .consts import AAVE_FIRST_BLOCK, DECIMALS_ASTETH, LIDO_STETH
-from .eth import AAVE_LPOOL, AAVE_ORACLE, AAVE_WETH_STABLE_DEBT, AAVE_WETH_VAR_DEBT, ASTETH, w3
+from .config import TRANSFER_EVENTS_BATCH
+from .eth import w3
+from .structs import Context, PoolPosition, UserInfo
 
 log = logging.getLogger(__name__)
 
 
-class AddressSet(set):
-    """Set for ETH addresses"""
-
-    def add(self, __element: HexStr) -> None:
-        if w3.toInt(hexstr=__element) == 0:
-            return  # skip NULL address
-        super().add(__element)
-
-
-ASTETH_HOLDERS = AddressSet()  # cache for hodlers
-
-
-def get_steth_eth_price(block: BlockIdentifier) -> int:
-    """Get the price of stETH in ETH from AAVE protocol"""
-
-    return AAVE_ORACLE.functions.getAssetPrice(LIDO_STETH).call(block_identifier=block)
-
-
-@dataclass
-class LendingPoolResponse:
-    """Response from AAVE Lending Pool contract getUserAccountData endpoint"""
-
-    collateral_eth: int
-    debt_eth: int
-    available_borrows_eth: int
-    current_liquidation_threshold: int
-    ltv: int
-    healthfactor: int
+UserAndBalance: TypeAlias = tuple[str, float]
 
 
 @unsync
-def get_user_stats(user: str, block: BlockIdentifier = "latest") -> LendingPoolResponse:
+def get_user_stats(ctx: Context, pair: PoolPosition, user: str) -> UserInfo:
     """Parse user stat from AAVE Lending Pool"""
-
-    address = w3.toChecksumAddress(user)
-    result = AAVE_LPOOL.functions.getUserAccountData(address).call(block_identifier=block)
-    return LendingPoolResponse(*result)
+    return pair.amm.get_user_info(user, ctx.curr_block)
 
 
 @unsync
-def get_asteth_balance(user: str, block: BlockIdentifier = "latest") -> float:
-    """Get user's astETH balance"""
-
-    address = w3.toChecksumAddress(user)
-    return ASTETH.functions.balanceOf(address).call(block_identifier=block)
+def get_atoken_balance(ctx: Context, pair: PoolPosition, user: str) -> float:
+    """Get user's aToken balance"""
+    return pair.get_total_supply(user, ctx.curr_block)
 
 
 @unsync
-def get_eth_debt(user: str, block: BlockIdentifier) -> float:
+def get_debt(ctx: Context, pair: PoolPosition, user: str) -> float:
     """Get balance of user from AAVE tokens contracts"""
-
-    address = w3.toChecksumAddress(user)
-    return sum(
-        (
-            AAVE_WETH_STABLE_DEBT.functions.balanceOf(address).call(block_identifier=block),
-            AAVE_WETH_VAR_DEBT.functions.balanceOf(address).call(block_identifier=block),
-        )
-    )
+    return pair.get_total_debt(user, ctx.curr_block)
 
 
-def get_block_info(block: BlockIdentifier) -> BlockData:
+def get_block_info(block: BlockIdentifier = "latest") -> BlockData:
     """Get the given block information"""
-
     return w3.eth.get_block(block)
 
 
-def get_latest_block() -> int:
+def get_latest_block_number() -> int:
     """Get the latest ETH block number"""
-
     return w3.eth.block_number
 
 
-def fetch_asteth_holders(start_block: int, last_block: int) -> list[dict]:
-    """Fetch astETH holders from ETH"""
+def find_new_atoken_holders(ctx: Context, pair: PoolPosition) -> None:
+    """Fetch AToken holders onchain"""
 
-    res = []
-
-    log.info("Fetching astETH holders within the blocks range %d,%d", start_block, last_block)
-    batch_size = 100_000
-    block = start_block
-    while block <= last_block:
+    log.info(
+        "Fetching %s holders within the blocks range %d,%d",
+        pair.supply_token.a_token.symbol,
+        ctx.init_block,
+        ctx.curr_block,
+    )
+    block = ctx.init_block
+    while block <= ctx.curr_block:
         args = {
             "fromBlock": block,
-            "toBlock": block + batch_size,
+            "toBlock": block + TRANSFER_EVENTS_BATCH,
         }
-        events = ASTETH.events.Transfer.getLogs(**args)
+        events = pair.supply_token.a_token.events.Transfer.getLogs(**args)
         for event in events:
-            ASTETH_HOLDERS.add(event["args"]["from"])
-            ASTETH_HOLDERS.add(event["args"]["to"])
-        block += batch_size
+            ctx.holders.add(event["args"]["from"])
+            ctx.holders.add(event["args"]["to"])
+        block += TRANSFER_EVENTS_BATCH
 
-    tasks = [(holder, get_asteth_balance(holder, last_block)) for holder in ASTETH_HOLDERS]
-    threshold = pow(10, DECIMALS_ASTETH) // 10  # 0.1
+
+def get_holders_balances(ctx: Context, pair: PoolPosition) -> Iterable[tuple[str, float]]:
+    """Get holders with balance above the threshold"""
+    tasks = [(h, get_atoken_balance(ctx, pair, h)) for h in ctx.holders]
     for holder, task in tasks:
         balance = task.result()  # type: ignore
-        if balance <= threshold:
-            ASTETH_HOLDERS.remove(holder)
+        yield (holder, balance)
+
+
+def drop_users_below_threshold(
+    ctx: Context, threshold: float, users_and_balances: Iterable[UserAndBalance]
+) -> Iterable[UserAndBalance]:
+    """Drop users with balance below the threshold"""
+    for user, balance in users_and_balances:
+        if balance < threshold:
+            ctx.holders.remove(user)
             continue
-        res.append({"user": holder, "amount": balance})
-
-    log.info("Found %d holders with non-zero balance", len(res))
-    return res
+        yield (user, balance)
 
 
-def parse(start_block: int | None = None) -> tuple[int, pd.DataFrame]:
-    """Parse required data"""
+def fetch(ctx: Context, pair: PoolPosition) -> pd.DataFrame | None:
+    """Fetch required blockchain data"""
 
-    latest_block = get_latest_block()
-    if latest_block == start_block:
-        raise Exception(f"Block {start_block} has been already read")
+    latest_block = get_latest_block_number()
+    if latest_block == ctx.init_block:
+        log.info("Block %d has been already read", latest_block)
+        return None
 
-    log.info("Fetching data at the block %d", latest_block)
-    start_block = start_block or AAVE_FIRST_BLOCK
-    users = fetch_asteth_holders(start_block, latest_block)
+    ctx.curr_block = latest_block
 
-    df = pd.DataFrame(users)
+    find_new_atoken_holders(ctx, pair)
+    buf = get_holders_balances(ctx, pair)
+    buf = drop_users_below_threshold(ctx, pair.balance_threshold, buf)  # NOTE: is there a better place for threshold?
+
+    df = pd.DataFrame(buf, columns=["user", "amount"])
+
+    if df.empty:
+        ctx.init_block = ctx.curr_block
+        log.info("No holders found")
+        return None
+
+    log.info("%d holders found", len(df))
     df.set_index("user")
 
     @unsync
-    def _parse_stats():
+    def _get_stats():
 
         buf = []
-        tasks = [(user, get_user_stats(user, latest_block)) for user in df["user"]]
+        tasks = [(user, get_user_stats(ctx, pair, user)) for user in df["user"]]
         for user, task in tasks:
-            stat: LendingPoolResponse = task.result()  # type: ignore
-            buf.append(
-                {
-                    "user": user,
-                    "collateral": stat.collateral_eth,
-                    "debt": stat.debt_eth,
-                    "available_borrow": stat.available_borrows_eth,
-                    "threshold": stat.current_liquidation_threshold,
-                    "ltv": stat.ltv,
-                    "healthf": stat.healthfactor,
-                }
-            )
+            stat: UserInfo = task.result()  # type: ignore
+            buf.append({"user": user, **stat})
         return buf
 
     @unsync
-    def _parse_eth_debth():
+    def _get_debt():
 
         buf = []
-        tasks = [(user, get_eth_debt(user, latest_block)) for user in df["user"]]
+        tasks = [(user, get_debt(ctx, pair, user)) for user in df["user"]]
         for user, task in tasks:
             debt: float = task.result()  # type: ignore
-            buf.append({"user": user, "ethdebt": debt})
+            buf.append({"user": user, "borrowed": debt})
         return buf
 
-    tasks = [_parse_stats(), _parse_eth_debth()]
+    tasks = [_get_stats(), _get_debt()]
     parts = [pd.DataFrame(task.result()) for task in tasks]  # type: ignore # pylint: disable=no-member
+
+    df["supply_price"] = pair.get_supply_token_price(ctx.curr_block)
+    df["debt_price"] = pair.get_debt_token_price(ctx.curr_block)
 
     for part in parts:
         df = df.merge(part, on="user", how="left")
 
-    return latest_block, df
+    # move context's blocks forward
+    ctx.init_block = ctx.curr_block
+
+    return df

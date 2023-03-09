@@ -12,6 +12,7 @@ services:
       EXPORTER_PORT:
       PARSE_INTERVAL:
       MAIN_ERROR_COOLDOWN:
+      TRANSFER_EVENTS_BATCH:
       LOG_FORMAT:
       LOG_LEVEL:
     restart: unless-stopped
