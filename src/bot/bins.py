@@ -6,11 +6,11 @@ from .analytics import Bin
 
 
 def steth_bin1(df: pd.DataFrame) -> pd.DataFrame:
-    """AAVE users with >=80% collaterals - stETH and  >=80% debt - ETH"""
+    """AAVE users with >=80% collaterals - stETH and >=80% debt - ETH"""
 
     df = df.copy()
 
-    df.query("diff_collateral <= 0.2 and diff_debt <= 0.2 and borrowed > 0", inplace=True)
+    df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0", inplace=True)
 
     return df
 
@@ -20,7 +20,7 @@ def steth_bin2(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df.query("diff_debt > 0.8", inplace=True)
+    df.query("diff_debt >= 0.8", inplace=True)
 
     return df
 
@@ -51,11 +51,11 @@ STETH: list[Bin] = [
 
 
 def wsteth_bin1_1(df: pd.DataFrame) -> pd.DataFrame:
-    """Users with e-mode (collateral - wstETH, debt - ETH)"""
+    """Users with e-mode with >=80% collaterals - wstETH and >=80% debt - ETH"""
 
     df = df.copy()
 
-    df = df.query("diff_collateral <= 0.2 and diff_debt <= 0.2 and borrowed > 0 and emode == True")
+    df = df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0 and emode == True")
 
     return df
 
@@ -65,7 +65,7 @@ def wsteth_bin1_2(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df = df.query("diff_collateral <= 0.2 and diff_debt <= 0.2 and borrowed > 0 and emode == False")
+    df = df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0 and emode == False")
 
     return df
 
@@ -75,7 +75,7 @@ def wsteth_bin2(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df.query("diff_debt > 0.8", inplace=True)
+    df.query("diff_debt >= 0.8", inplace=True)
 
     return df
 
