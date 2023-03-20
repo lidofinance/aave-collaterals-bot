@@ -1,70 +1,55 @@
 ### AAVE collaterals monitoring bot
 
-Parse borrowers data from AAVE protocol and calculate risks distribution
-based on collateral to loan ratio, see zones definition below.
+Prometheus expoter which parses borrowers data from AAVE protocol and calculate risks distribution
+based on collateral to loan ratio.
+
+#### Run
+
+`docker compose`
+
+- Create a `.env` file from `.env.example` and fill in the required variables.
+- Execute command:
+```bash
+docker compose up -d bot
+```
+
+`docker`
+
+- Create a `.env` file from `.env.example` and fill in the required variables.
+- Build image:
+```bash
+docker build -t aave-bot .
+```
+- Run container:
+```bash
+docker run -d -P --env-file ./.env aave-bot
+```
+
+`dev`
+
+- Expose environment variables presented at `.env.example`.
+- Install dependencies via poetry:
+``` bash
+poetry install
+```
+- Execute command:
+```bash
+python src/main.py
+```
 
 #### Zones definition
 
-Risk zones defined as a ranges of collateral to loan ration
+Risk zones defined as a ranges of collateral to loan ration and can be found at `./src/bot/bins.py` file.
 
-##### Bin 1
+#### The most important exposed metrics
 
-AAVE users with >=80% collaterals - stETH and  >=80% debt - ETH
-
-| Zone        | >    | <    |
-|-------------|------|------|
-| A           | 1.42 | ∞    |
-| B+          | 1.21 | 1.42 |
-| B           | 1.14 | 1.21 |
-| B-          | 1.07 | 1.14 |
-| C           | 1.03 | 1.07 |
-| D           | 1.00 | 1.03 |
-| Liquidation | 0    | 1.00 |
-
-##### Bin 2
-
-AAVE users with stETH collateral and >=80% debt - not ETH
-
-| Zone        | >    | <    |
-|-------------|------|------|
-| A           | 2.50 | ∞    |
-| B+          | 1.75 | 2.50 |
-| B           | 1.50 | 1.75 |
-| B-          | 1.25 | 1.50 |
-| C           | 1.10 | 1.25 |
-| D           | 1.00 | 1.10 |
-| Liquidation | 0    | 1.00 |
-
-##### Bin 3
-
-All the others AAVE users with stETH collateral
-
-| Zone        | >    | <    |
-|-------------|------|------|
-| A           | 2.50 | ∞    |
-| B+          | 1.75 | 2.50 |
-| B           | 1.50 | 1.75 |
-| B-          | 1.25 | 1.50 |
-| C           | 1.10 | 1.25 |
-| D           | 1.00 | 1.10 |
-| Liquidation | 0    | 1.00 |
-
-#### Exposed metrics
-
-- `{}_collateral_percentage{zone=<zone>, bin=<bin>}` is computed percent of collaterals in the given zone and bin
-
-#### Configuration
-
-Configure bot via the following environment variables:
-
-- `NODE_ENDPOINT` is ETH1 endpoint
-- `PARSE_INTERVAL` is a delay in seconds between API fetches
-- `EXPORTER_PORT` is the port to expose metrics on
-- `LOG_FORMAT` is one of {"simple", "json"}
+- `{}_collateral_percentage{pair=<pair>, zone=<zone>, bin=<bin>}` is computed percent of collaterals in the given pair,
+zone and bin
 
 #### Visualisation
 
-Dashboard available [here](https://grafana-automation.lido.fi/d/wYiKGhynz/aave-bot?orgId=1).
+Pre-built grafana dashboards available in the `./grafana` directory. To run locally use docker-compose file as a
+reference.
 
 ## Release flow
 

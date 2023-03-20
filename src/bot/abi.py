@@ -12,6 +12,7 @@ def load_abi(abi_name: str) -> str:
         return f.read()
 
 
+PoolAddressesProvider = load_abi("PoolAddressesProvider.json")
 LendingPool = load_abi("LendingPool.json")
 Oracle = load_abi("Oracle.json")
 ERC20 = load_abi("ERC20.json")
