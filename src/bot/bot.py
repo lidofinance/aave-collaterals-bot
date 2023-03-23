@@ -2,6 +2,7 @@
 
 import logging
 import time
+from contextlib import suppress
 from pprint import PrettyPrinter
 
 import pandas as pd
@@ -10,7 +11,8 @@ from .aaveparser import fetch
 from .analytics import get_zones_values
 from .config import MAIN_ERROR_COOLDOWN, PARSE_INTERVAL
 from .eth import w3
-from .metrics import APP_ERRORS, COLLATERALS, FETCH_DURATION, PROCESSING_COMPLETED
+from .metrics import APP_ERRORS, COLLATERALS, FETCH_DURATION, NETWORK, PROCESSING_COMPLETED
+from .structs import ChainId
 from .worker import Worker, arbwstETH, astETH, awstETH, polStMATIC
 
 
@@ -21,6 +23,7 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
         self.log = logging.getLogger(__name__)
         self.pprint = PrettyPrinter(indent=4)
         self.chain_id = w3.eth.chain_id
+        self._expose_network_metric()
 
         # List all workers to process
         # NB! less holders first to decrease of the number of requests of error
@@ -76,3 +79,9 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
     def _on_success(self) -> None:
         self.log.info("Wait for %d seconds for the next fetch", PARSE_INTERVAL)
         time.sleep(PARSE_INTERVAL)
+
+    def _expose_network_metric(self) -> None:
+        network_name = "unknown"
+        with suppress(ValueError):
+            network_name = ChainId(self.chain_id).name.lower()
+        NETWORK.labels(network_name, self.chain_id).set(1)
