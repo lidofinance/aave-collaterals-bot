@@ -199,8 +199,13 @@ class Market:
 
     def get_user_emode(self, user: str, block: BlockIdentifier) -> bool | None:
         """Get user e-mode flag"""
-        with suppress(ContractLogicError):
-            return bool(self.lending_pool.functions.getUserEMode(user).call(block_identifier=block))
+        try:
+            with suppress(ContractLogicError):
+                return bool(self.lending_pool.functions.getUserEMode(user).call(block_identifier=block))
+        except ValueError as ex:
+            if "execution error" in str(ex):  # nethermind?
+                return None
+            raise
 
         return None
 
