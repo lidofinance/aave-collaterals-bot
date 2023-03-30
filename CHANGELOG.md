@@ -1,3 +1,17 @@
+# [1.10.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.9.0...1.10.0) (2023-03-30)
+
+
+### Bug Fixes
+
+* ContractLogicError is not raised from nethermind? response ([e951b3b](https://github.com/lidofinance/aave-collaterals-bot/commit/e951b3b5e4ea2968adc067e9f0378adc25e3c924))
+
+
+### Features
+
+* support L2s ([1ba581d](https://github.com/lidofinance/aave-collaterals-bot/commit/1ba581db49263fe5acb977163431575a7df1e3e8))
+
+
+
 # [1.9.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.8.0...1.9.0) (2023-03-09)
 
 
@@ -118,15 +132,6 @@
 ### Features
 
 * **metrics:** instrumenting app ([6a09ecd](https://github.com/lidofinance/aave-collaterals-bot/commit/6a09ecda317b004c32e8c8955e568b7f88efec80))
-
-
-
-# [1.2.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.1.0...1.2.0) (2022-05-23)
-
-
-### Features
-
-* update configs and improve logging ([127ccfc](https://github.com/lidofinance/aave-collaterals-bot/commit/127ccfcc6173cfabdc3e80aae5f306d609a268e0))
 
 
 
