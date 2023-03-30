@@ -99,8 +99,11 @@ class Oracle(IsContract):
         try:
             base_unit_precision = self.contract.functions.BASE_CURRENCY_UNIT().call()
             return int(math.log(base_unit_precision, 10))
-        except ContractLogicError:
-            return ETH_DECIMALS  # defaults to ETH-based
+        except ValueError as ex:
+            # ContractLogicError is subclass of ValueError
+            if isinstance(ex, ContractLogicError) or "execution error" in str(ex):
+                return ETH_DECIMALS  # defaults to ETH-based
+            raise
 
     @cached_property
     def precision(self) -> int:
@@ -131,8 +134,12 @@ class LendingPool(IsContract):
         """Lending Pool Addresses Provider"""
         try:
             address = self.contract.functions.getAddressesProvider().call()
-        except ContractLogicError:
-            address = self.contract.functions.ADDRESSES_PROVIDER().call()
+        except ValueError as ex:
+            # ContractLogicError is subclass of ValueError
+            if isinstance(ex, ContractLogicError) or "execution error" in str(ex):
+                address = self.contract.functions.ADDRESSES_PROVIDER().call()
+            else:
+                raise
         return PoolAddressesProvider(address=address)
 
     @cached_property
