@@ -1,6 +1,7 @@
 """Data structs"""
 
 import math
+from abc import ABC, abstractmethod
 from contextlib import suppress
 from dataclasses import dataclass, field
 from enum import IntEnum
@@ -88,22 +89,16 @@ class DebtToken(ERC20Like):
 
 
 @dataclass
-class Oracle(IsContract):
+class Oracle(ABC, IsContract):
     """AAVE Oracle"""
 
     abi = abi.Oracle
 
-    @cached_property
+    @property
+    @abstractmethod
     def decimals(self) -> int:
         """Precision of returned values"""
-        try:
-            base_unit_precision = self.contract.functions.BASE_CURRENCY_UNIT().call()
-            return int(math.log(base_unit_precision, 10))
-        except ValueError as ex:
-            # ContractLogicError is subclass of ValueError
-            if isinstance(ex, ContractLogicError) or "execution error" in str(ex):
-                return ETH_DECIMALS  # defaults to ETH-based
-            raise
+        raise NotImplementedError
 
     @cached_property
     def precision(self) -> int:
@@ -116,6 +111,25 @@ class Oracle(IsContract):
         return self.contract.functions.getAssetPrice(asset).call(block_identifier=block) / self.precision
 
 
+class OracleV2(Oracle):
+    """AAVE Oracle V2"""
+
+    @cached_property
+    def decimals(self) -> int:
+        """Precision of returned values"""
+        return ETH_DECIMALS
+
+
+class OracleV3(Oracle):
+    """AAVE Oracle V3"""
+
+    @cached_property
+    def decimals(self) -> int:
+        """Precision of returned values"""
+        base_unit_precision = self.contract.functions.BASE_CURRENCY_UNIT().call()
+        return int(math.log(base_unit_precision, 10))
+
+
 @dataclass
 class PoolAddressesProvider(IsContract):
     """AAVE Addresses Provider"""
@@ -124,29 +138,56 @@ class PoolAddressesProvider(IsContract):
 
 
 @dataclass
-class LendingPool(IsContract):
+class LendingPool(ABC, IsContract):
     """AAVE Pool"""
 
     abi = abi.LendingPool
 
+    @property
+    @abstractmethod
+    def addresses_provider(self) -> IsContract:
+        """Lending Pool Addresses Provider"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def oracle(self) -> Oracle:
+        """LendingPool Price Oracle"""
+        raise NotImplementedError
+
+
+@dataclass
+class LendingPoolV2(LendingPool):
+    """AAVE Pool v2"""
+
     @cached_property
     def addresses_provider(self) -> IsContract:
         """Lending Pool Addresses Provider"""
-        try:
-            address = self.contract.functions.getAddressesProvider().call()
-        except ValueError as ex:
-            # ContractLogicError is subclass of ValueError
-            if isinstance(ex, ContractLogicError) or "execution error" in str(ex):
-                address = self.contract.functions.ADDRESSES_PROVIDER().call()
-            else:
-                raise
+        address = self.contract.functions.getAddressesProvider().call()
         return PoolAddressesProvider(address=address)
 
     @cached_property
     def oracle(self) -> Oracle:
         """LendingPool Price Oracle"""
         address = self.addresses_provider.functions.getPriceOracle().call()
-        return Oracle(address=address)
+        return OracleV2(address=address)
+
+
+@dataclass
+class LendingPoolV3(LendingPool):
+    """AAVE Pool v3"""
+
+    @cached_property
+    def addresses_provider(self) -> IsContract:
+        """Lending Pool Addresses Provider"""
+        address = self.contract.functions.ADDRESSES_PROVIDER().call()
+        return PoolAddressesProvider(address=address)
+
+    @cached_property
+    def oracle(self) -> Oracle:
+        """LendingPool Price Oracle"""
+        address = self.addresses_provider.functions.getPriceOracle().call()
+        return OracleV3(address=address)
 
 
 class LPUserAccountDataResponse(NamedTuple):
@@ -206,13 +247,13 @@ class Market:
 
     def get_user_emode(self, user: str, block: BlockIdentifier) -> bool | None:
         """Get user e-mode flag"""
-        try:
-            with suppress(ContractLogicError):
-                return bool(self.lending_pool.functions.getUserEMode(user).call(block_identifier=block))
-        except ValueError as ex:
-            if "execution error" in str(ex):  # nethermind?
-                return None
-            raise
+        if isinstance(self.lending_pool, LendingPoolV3):
+            try:
+                with suppress(ContractLogicError):
+                    return bool(self.lending_pool.functions.getUserEMode(user).call(block_identifier=block))
+            except ValueError as ex:
+                if "execution error" not in str(ex):  # nethermind?
+                    raise
 
         return None
 

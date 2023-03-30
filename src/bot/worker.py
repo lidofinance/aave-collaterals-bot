@@ -5,7 +5,17 @@ from typing import Iterable
 
 from . import bins
 from .analytics import Bin
-from .structs import ChainId, Context, DebtToken, ERC20Like, LendingPool, Market, PoolPosition, SupplyToken
+from .structs import (
+    ChainId,
+    Context,
+    DebtToken,
+    ERC20Like,
+    LendingPoolV2,
+    LendingPoolV3,
+    Market,
+    PoolPosition,
+    SupplyToken,
+)
 
 
 @dataclass
@@ -21,7 +31,7 @@ class Worker:
 astETH = Worker(
     pair=PoolPosition(
         chain_id=ChainId.HOMESTEAD,
-        amm=Market(lending_pool=LendingPool(address="0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9")),
+        amm=Market(lending_pool=LendingPoolV2(address="0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9")),
         supply_token=SupplyToken(
             a_token=ERC20Like(address="0x1982b2F5814301d4e9a8b0201555376e62F82428"),
             address="0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
@@ -41,7 +51,7 @@ astETH = Worker(
 awstETH = Worker(
     pair=PoolPosition(
         chain_id=ChainId.HOMESTEAD,
-        amm=Market(lending_pool=LendingPool(address="0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2")),
+        amm=Market(lending_pool=LendingPoolV3(address="0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2")),
         supply_token=SupplyToken(
             a_token=ERC20Like(address="0x0B925eD163218f6662a35e0f0371Ac234f9E9371"),
             address="0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
@@ -61,7 +71,7 @@ awstETH = Worker(
 polStMATIC = Worker(
     pair=PoolPosition(
         chain_id=ChainId.POLYGON,
-        amm=Market(lending_pool=LendingPool(address="0x794a61358D6845594F94dc1DB02A252b5b4814aD")),
+        amm=Market(lending_pool=LendingPoolV3(address="0x794a61358D6845594F94dc1DB02A252b5b4814aD")),
         supply_token=SupplyToken(
             a_token=ERC20Like(address="0xEA1132120ddcDDA2F119e99Fa7A27a0d036F7Ac9"),
             address="0x3A58a54C066FdC0f2D55FC9C89F0415C92eBf3C4",
@@ -81,7 +91,7 @@ polStMATIC = Worker(
 arbwstETH = Worker(
     pair=PoolPosition(
         chain_id=ChainId.ARBITRUM,
-        amm=Market(lending_pool=LendingPool(address="0x794a61358D6845594F94dc1DB02A252b5b4814aD")),
+        amm=Market(lending_pool=LendingPoolV3(address="0x794a61358D6845594F94dc1DB02A252b5b4814aD")),
         supply_token=SupplyToken(
             a_token=ERC20Like(address="0x513c7E3a9c69cA3e22550eF58AC1C0088e918FFf"),
             address="0x5979D7b546E38E414F7E9822514be443A4800529",
