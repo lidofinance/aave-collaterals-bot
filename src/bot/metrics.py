@@ -1,5 +1,4 @@
 """Exporter metrics definitions"""
-
 import json
 import logging
 import os
@@ -50,21 +49,33 @@ BUILD_INFO = Gauge(
     ("pyversion", "version", "branch", "commit"),
 )
 
+NETWORK = Gauge(
+    f"{PREFIX}_network",
+    "Blockchain network info",
+    ("name", "chain_id"),
+)
+
 
 def report_build_info() -> None:
     """Report _build_info metric"""
 
-    labels = {"pyversion": ".".join(pf.python_version_tuple())}
+    labels = {
+        "pyversion": ".".join(pf.python_version_tuple()),
+        "version": "unknown",
+        "branch": "unknown",
+        "commit": "unknown",
+    }
 
     if os.path.exists(BUILD_INFO_PATH):
         try:
             with open(BUILD_INFO_PATH, mode="r", encoding="utf-8") as f:
                 info = json.load(f)
-                if isinstance(info, dict):
-                    labels["version"] = info.get("version", "unknown")
-                    labels["branch"] = info.get("branch", "unknown")
-                    labels["commit"] = info.get("commit", "unknown")
         except Exception as ex:  # pylint: disable=broad-except
             log.error("Unable to read build info file", exc_info=ex)
+        else:
+            if isinstance(info, dict):
+                labels["version"] = info.get("version", labels["version"])
+                labels["branch"] = info.get("branch", labels["branch"])
+                labels["commit"] = info.get("commit", labels["commit"])
 
     BUILD_INFO.labels(**labels).set(1)

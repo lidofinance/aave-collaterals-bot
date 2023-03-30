@@ -70,5 +70,5 @@ FALLBACK_NODE_ENDPOINT = getenv("FALLBACK_NODE_ENDPOINT", str, default="")
 MAIN_ERROR_COOLDOWN = getenv("MAIN_ERROR_COOLDOWN", int, default=15)
 PARSE_INTERVAL = getenv("PARSE_INTERVAL", int, default=2700)
 EXPORTER_PORT = getenv("EXPORTER_PORT", int, default=8080)
-# 10k blocks per batch is compatible with the most of the providers
+# 10k blocks per batch is compatible with the most of the providers (for L2s 100k fits better)
 TRANSFER_EVENTS_BATCH = getenv("TRANSFER_EVENTS_BATCH", int, default=10_000)

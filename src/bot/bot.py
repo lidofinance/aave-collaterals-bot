@@ -2,6 +2,7 @@
 
 import logging
 import time
+from contextlib import suppress
 from pprint import PrettyPrinter
 
 import pandas as pd
@@ -9,8 +10,10 @@ import pandas as pd
 from .aaveparser import fetch
 from .analytics import get_zones_values
 from .config import MAIN_ERROR_COOLDOWN, PARSE_INTERVAL
-from .metrics import APP_ERRORS, COLLATERALS, FETCH_DURATION, PROCESSING_COMPLETED
-from .worker import Worker, astETH, awstETH
+from .eth import w3
+from .metrics import APP_ERRORS, COLLATERALS, FETCH_DURATION, NETWORK, PROCESSING_COMPLETED
+from .structs import ChainId
+from .worker import Worker, arbwstETH, astETH, awstETH, polStMATIC
 
 
 class AAVEBot:  # pylint: disable=too-few-public-methods
@@ -19,21 +22,27 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
     def __init__(self) -> None:
         self.log = logging.getLogger(__name__)
         self.pprint = PrettyPrinter(indent=4)
+        self.chain_id = w3.eth.chain_id
+        self._expose_network_metric()
 
         # List all workers to process
         # NB! less holders first to decrease of the number of requests of error
         self.workers = (
+            arbwstETH,
             awstETH,
+            polStMATIC,
             astETH,
         )
 
     def run(self) -> None:
         """Main loop of bot"""
 
+        self.log.info("Running on chain ID %s", self.chain_id)
         while True:
             try:
                 for w in self.workers:
-                    self._run_worker(w)
+                    if w.pair.chain_id == self.chain_id:
+                        self._run_worker(w)
             except Exception as ex:  # pylint: disable=broad-except
                 self._on_error(ex)
             else:
@@ -70,3 +79,9 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
     def _on_success(self) -> None:
         self.log.info("Wait for %d seconds for the next fetch", PARSE_INTERVAL)
         time.sleep(PARSE_INTERVAL)
+
+    def _expose_network_metric(self) -> None:
+        network_name = "unknown"
+        with suppress(ValueError):
+            network_name = ChainId(self.chain_id).name.lower()
+        NETWORK.labels(network_name, self.chain_id).set(1)

@@ -110,3 +110,48 @@ WSTETH: list[Bin] = [
         wsteth_bin3,
     ),
 ]
+
+
+def st_matic_bin1(df: pd.DataFrame) -> pd.DataFrame:
+    """AAVE users with >=80% collaterals - stMATIC and >=80% debt - MATIC"""
+
+    df = df.copy()
+
+    df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0", inplace=True)
+
+    return df
+
+
+def st_matic_bin2(df: pd.DataFrame) -> pd.DataFrame:
+    """AAVE users with stMATIC collateral and >=80% debt - not MATIC"""
+
+    df = df.copy()
+
+    df.query("diff_debt >= 0.8", inplace=True)
+
+    return df
+
+
+def st_matic_bin3(df: pd.DataFrame) -> pd.DataFrame:
+    """All the others AAVE users with stMATIC collateral"""
+
+    bin1_df = st_matic_bin1(df)
+    bin2_df = st_matic_bin2(df)
+
+    return pd.DataFrame(pd.concat([df, bin1_df, bin2_df]).drop_duplicates(keep=False))
+
+
+STMATIC: list[Bin] = [
+    (
+        (1.42, 1.21, 1.14, 1.07, 1.03, 1.00),
+        st_matic_bin1,
+    ),
+    (
+        (2.50, 1.75, 1.50, 1.25, 1.10, 1.00),
+        st_matic_bin2,
+    ),
+    (
+        (2.50, 1.75, 1.50, 1.25, 1.10, 1.00),
+        st_matic_bin3,
+    ),
+]

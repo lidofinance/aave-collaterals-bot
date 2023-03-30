@@ -19,8 +19,10 @@ from .eth import get_contract, w3
 class ChainId(IntEnum):
     """Chain IDs"""
 
-    MAINNET = 1
+    HOMESTEAD = 1
+    OPTIMISM = 10
     POLYGON = 137
+    ARBITRUM = 42161
 
 
 class AddressSet(set):
@@ -105,12 +107,39 @@ class Oracle(IsContract):
         """Precision of returned values"""
         return 10**self.decimals
 
+    def asset_price(self, asset: str, block: BlockIdentifier) -> float:
+        """Get asset price in base units"""
+        asset = w3.toChecksumAddress(asset)
+        return self.contract.functions.getAssetPrice(asset).call(block_identifier=block) / self.precision
+
+
+@dataclass
+class PoolAddressesProvider(IsContract):
+    """AAVE Addresses Provider"""
+
+    abi = abi.PoolAddressesProvider
+
 
 @dataclass
 class LendingPool(IsContract):
     """AAVE Pool"""
 
     abi = abi.LendingPool
+
+    @cached_property
+    def addresses_provider(self) -> IsContract:
+        """Lending Pool Addresses Provider"""
+        try:
+            address = self.contract.functions.getAddressesProvider().call()
+        except ContractLogicError:
+            address = self.contract.functions.ADDRESSES_PROVIDER().call()
+        return PoolAddressesProvider(address=address)
+
+    @cached_property
+    def oracle(self) -> Oracle:
+        """LendingPool Price Oracle"""
+        address = self.addresses_provider.functions.getPriceOracle().call()
+        return Oracle(address=address)
 
 
 class LPUserAccountDataResponse(NamedTuple):
@@ -142,17 +171,16 @@ class Market:
     """Market on AAVE"""
 
     lending_pool: LendingPool
-    oracle: Oracle  # NOTE: get onchain via call to addresses provider
 
     @cached_property
     def base_precision(self) -> int:
         """Precision of the base token"""
-        return self.oracle.precision
+        return self.lending_pool.oracle.precision
 
-    def get_asset_price(self, asset: str, block: BlockIdentifier) -> int:
+    def get_asset_price(self, asset: str, block: BlockIdentifier) -> float:
         """Get asset price in base units"""
         asset = w3.toChecksumAddress(asset)
-        return self.oracle.contract.functions.getAssetPrice(asset).call(block_identifier=block) / self.oracle.precision
+        return self.lending_pool.oracle.asset_price(asset, block)
 
     def get_user_info(self, user: str, block: BlockIdentifier) -> UserInfo:
         """Get user account data from AAVE Lending Pool"""
@@ -171,8 +199,13 @@ class Market:
 
     def get_user_emode(self, user: str, block: BlockIdentifier) -> bool | None:
         """Get user e-mode flag"""
-        with suppress(ContractLogicError):
-            return bool(self.lending_pool.functions.getUserEMode(user).call(block_identifier=block))
+        try:
+            with suppress(ContractLogicError):
+                return bool(self.lending_pool.functions.getUserEMode(user).call(block_identifier=block))
+        except ValueError as ex:
+            if "execution error" in str(ex):  # nethermind?
+                return None
+            raise
 
         return None
 
@@ -187,11 +220,16 @@ class PoolPosition:
     debt_token: DebtToken
 
     balance_threshold: float = 0
+    chain_id: ChainId = ChainId.HOMESTEAD
 
     @cached_property
     def name(self) -> str:
         """Get position name"""
-        return f"{self.supply_token.symbol}-{self.debt_token.symbol}"
+        name = f"{self.supply_token.symbol}-{self.debt_token.symbol}"
+        if self.chain_id != ChainId.HOMESTEAD:
+            chain_suffix = str(self.chain_id).split(".").pop().lower()
+            return f"{name}-{chain_suffix}"
+        return name
 
     def get_total_supply(self, user: str, block: BlockIdentifier) -> float:
         """Get user total supplied amount of the collateral token"""
@@ -211,11 +249,11 @@ class PoolPosition:
             )
         )
 
-    def get_supply_token_price(self, block: BlockIdentifier) -> int:
+    def get_supply_token_price(self, block: BlockIdentifier) -> float:
         """Get supply token price in base units"""
         return self.amm.get_asset_price(self.supply_token.address, block)
 
-    def get_debt_token_price(self, block: BlockIdentifier) -> int:
+    def get_debt_token_price(self, block: BlockIdentifier) -> float:
         """Get debt token price in base units"""
         return self.amm.get_asset_price(self.debt_token.address, block)
 
