@@ -1,3 +1,12 @@
+## [1.10.1](https://github.com/lidofinance/aave-collaterals-bot/compare/1.10.0...1.10.1) (2023-04-03)
+
+
+### Bug Fixes
+
+* cover additional ContractLogicError usages ([b3d57aa](https://github.com/lidofinance/aave-collaterals-bot/commit/b3d57aa57183ed3bda572117844e77f0b5569991))
+
+
+
 # [1.10.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.9.0...1.10.0) (2023-03-30)
 
 
@@ -118,20 +127,6 @@
 ### Features
 
 * **metrics:** add build info metric ([3508fe6](https://github.com/lidofinance/aave-collaterals-bot/commit/3508fe61464421dc83634605e20d3358e9d6ab99))
-
-
-
-# [1.3.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.2.0...1.3.0) (2022-06-03)
-
-
-### Bug Fixes
-
-* Release flow ([9ada80d](https://github.com/lidofinance/aave-collaterals-bot/commit/9ada80d1ac9c62414765615a9a303352ba4c3b48))
-
-
-### Features
-
-* **metrics:** instrumenting app ([6a09ecd](https://github.com/lidofinance/aave-collaterals-bot/commit/6a09ecda317b004c32e8c8955e568b7f88efec80))
 
 
 
