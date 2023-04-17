@@ -143,7 +143,7 @@ def st_matic_bin3(df: pd.DataFrame) -> pd.DataFrame:
 
 STMATIC: list[Bin] = [
     (
-        (1.42, 1.21, 1.14, 1.07, 1.03, 1.00),
+        (1.42, 1.21, 1.14, 1.07, 1.01, 1.00),
         st_matic_bin1,
     ),
     (
