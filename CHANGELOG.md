@@ -1,3 +1,12 @@
+## [1.10.2](https://github.com/lidofinance/aave-collaterals-bot/compare/1.10.1...1.10.2) (2023-04-17)
+
+
+### Bug Fixes
+
+* stMATIC bin 1 coeffs fix ([8db04f2](https://github.com/lidofinance/aave-collaterals-bot/commit/8db04f21dd7e7cbd15275c6c262784c745ac4e69))
+
+
+
 ## [1.10.1](https://github.com/lidofinance/aave-collaterals-bot/compare/1.10.0...1.10.1) (2023-04-03)
 
 
@@ -113,20 +122,6 @@
 ### Bug Fixes
 
 * **analytics:** fix mistakes in bins definitions ([f2ec77a](https://github.com/lidofinance/aave-collaterals-bot/commit/f2ec77ad31fbc287956ad3baaf62037aaa9e301e))
-
-
-
-# [1.4.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.3.0...1.4.0) (2022-06-13)
-
-
-### Bug Fixes
-
-* Release flow ([cbd7a49](https://github.com/lidofinance/aave-collaterals-bot/commit/cbd7a49e4319c91cdc08adcdf3e438b826ef1005))
-
-
-### Features
-
-* **metrics:** add build info metric ([3508fe6](https://github.com/lidofinance/aave-collaterals-bot/commit/3508fe61464421dc83634605e20d3358e9d6ab99))
 
 
 

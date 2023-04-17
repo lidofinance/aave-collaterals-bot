@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "aave-collaterals-bot"
 description = "Prometheus+Alertmanager driven AAVE stETH collaterals monitoring bot"
-version = "1.10.1"
+version = "1.10.2"
 authors = [ "madlabman <madlabman@mail.ru>" ]
 license = "apache-2.0"
 homepage= "https://github.com/lidofinance/aave-collaterals-bot"
