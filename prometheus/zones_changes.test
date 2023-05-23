@@ -49,11 +49,26 @@ tests:
               summary: High percent of AAVE stETH-WETH bin 1 collaterals in dangerous zone 🔥
               description: >-
                 > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                -
 
-                It is 20% (20.0 stETH) of bin 1 in risky zone,
-                from which 10% (10.0 stETH) in C-category,
-                10% (10.0 stETH) in D-category,
-                0% in liquidation-category
+                - 20% in C+D+liquidation
+                - 20.0 stETH
+                -
+
+                - 10% in C
+                - 10.0 stETH
+                -
+
+                - 10% in D
+                - 10.0 stETH
+                -
+
+                - 0% in liquidation
+                - 0.0 stETH
+                -
 
           # Bin 2
           - exp_labels:
@@ -64,11 +79,26 @@ tests:
               summary: High percent of AAVE stETH-WETH bin 2 collaterals in dangerous zone 🔥
               description: >-
                 > AAVE users with stETH collateral and >=80% debt not in ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                -
 
-                It is 17% (17.0 stETH) of bin 2 in risky zone,
-                from which 0% in C-category,
-                17% (17.0 stETH) in D-category,
-                0% in liquidation-category
+                - 17% in C+D+liquidation
+                - 17.0 stETH
+                -
+
+                - 0% in C
+                - 0.0 stETH
+                -
+
+                - 17% in D
+                - 17.0 stETH
+                -
+
+                - 0% in liquidation
+                - 0.0 stETH
+                -
 
   # AAVEHighAmountCollateralsUnderRisk
   - interval: 5m
@@ -113,11 +143,26 @@ tests:
               summary: High percent of AAVE wstETH-WETH bin 1 collaterals in dangerous zone 🔥
               description: >-
                 > Users with e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                -
 
-                It is 6% (6.0 wstETH) of bin 1 in risky zone,
-                from which 0% in C-category,
-                6% (6.0 wstETH) in D-category,
-                0% in liquidation-category
+                - 6% in C+D+liquidation
+                - 6.0 wstETH
+                -
+
+                - 0% in C
+                - 0.0 wstETH
+                -
+
+                - 6% in D
+                - 6.0 wstETH
+                -
+
+                - 0% in liquidation
+                - 0.0 wstETH
+                -
 
           - exp_labels:
               pair: wstETH-WETH
@@ -128,11 +173,26 @@ tests:
               summary: High percent of AAVE wstETH-WETH bin 2 collaterals in dangerous zone 🔥
               description: >-
                 > Users without e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                -
 
-                It is 12% (120.0 wstETH) of bin 2 in risky zone,
-                from which 0% in C-category,
-                12% (120.0 wstETH) in D-category,
-                0% in liquidation-category
+                - 12% in C+D+liquidation
+                - 120.0 wstETH
+                -
+
+                - 0% in C
+                - 0.0 wstETH
+                -
+
+                - 12% in D
+                - 120.0 wstETH
+                -
+
+                - 0% in liquidation
+                - 0.0 wstETH
+                -
 
   # AAVECollateralsLiquidation
   - interval: 5m
