@@ -54,7 +54,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 0
       },
@@ -119,11 +119,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
-      "id": 12,
+      "id": 18,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -151,7 +151,7 @@
           "refId": "A"
         }
       ],
-      "title": "🥈 BIN 2 risks",
+      "title": "🥇 BIN 2 risks",
       "type": "gauge"
     },
     {
@@ -184,11 +184,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 12,
         "y": 0
       },
-      "id": 13,
+      "id": 17,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -216,11 +216,76 @@
           "refId": "A"
         }
       ],
-      "title": "🥉 BIN 3 risks",
+      "title": "🥈 BIN 3 risks",
       "type": "gauge"
     },
     {
-      "description": "AAVE users with >=80% collaterals - stMATIC and  >=80% debt - MATIC",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 16,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.4.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
+          "exemplar": true,
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"stMATIC-WMATIC-polygon\",bin=\"4\"}",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "🥉 BIN 4 risks",
+      "type": "gauge"
+    },
+    {
+      "description": "Users with e-mode and with >=80% collateral - stMATIC and  >=80% debt - MATIC",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -396,7 +461,7 @@
       "type": "timeseries"
     },
     {
-      "description": "AAVE users with stMATIC collateral and >=80% debt - not MATIC",
+      "description": "Users without e-mode and with >=80% collateral - stMATIC and  >=80% debt - MATIC",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -430,6 +495,7 @@
               "mode": "area"
             }
           },
+          "decimals": 0,
           "mappings": [],
           "max": 0.6,
           "min": 0,
@@ -456,7 +522,7 @@
         "x": 0,
         "y": 17
       },
-      "id": 3,
+      "id": 19,
       "options": {
         "legend": {
           "calcs": [],
@@ -481,7 +547,7 @@
           "refId": "A"
         }
       ],
-      "title": "🥈 AAVE risks BIN 2",
+      "title": "🥇 AAVE risks BIN 2",
       "type": "timeseries"
     },
     {
@@ -542,7 +608,7 @@
         "x": 12,
         "y": 17
       },
-      "id": 14,
+      "id": 20,
       "options": {
         "legend": {
           "calcs": [],
@@ -568,6 +634,181 @@
         }
       ],
       "title": "Bin 2 zones overview",
+      "type": "timeseries"
+    },
+    {
+      "description": "AAVE users with stMATIC collateral and >=80% debt - not MATIC",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
+            }
+          },
+          "mappings": [],
+          "max": 0.6,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 26
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
+          "exemplar": true,
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"stMATIC-WMATIC-polygon\",bin=\"3\"}",
+          "interval": "",
+          "legendFormat": "C+D+liquidation",
+          "refId": "A"
+        }
+      ],
+      "title": "🥈 AAVE risks BIN 3",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 26
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Ggj6dYQ7z"
+          },
+          "exemplar": true,
+          "expr": "aave_bot_collaterals{pair=\"stMATIC-WMATIC-polygon\",bin=\"3\"} / on (pair,bin) group_left aave_bot_collaterals:total",
+          "interval": "",
+          "legendFormat": "{{zone}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Bin 3 zones overview",
       "type": "timeseries"
     },
     {
@@ -629,7 +870,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 35
       },
       "id": 4,
       "options": {
@@ -650,13 +891,13 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals:risky:percent{pair=\"stMATIC-WMATIC-polygon\",bin=\"3\"}",
+          "expr": "aave_bot_collaterals:risky:percent{pair=\"stMATIC-WMATIC-polygon\",bin=\"4\"}",
           "interval": "",
           "legendFormat": "C+D+liquidation",
           "refId": "A"
         }
       ],
-      "title": "🥉 AAVE risks BIN 3",
+      "title": "🥉 AAVE risks BIN 4",
       "type": "timeseries"
     },
     {
@@ -715,7 +956,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 35
       },
       "id": 15,
       "options": {
@@ -736,13 +977,13 @@
             "uid": "Ggj6dYQ7z"
           },
           "exemplar": true,
-          "expr": "aave_bot_collaterals{pair=\"stMATIC-WMATIC-polygon\",bin=\"3\"} / on (pair,bin) group_left aave_bot_collaterals:total",
+          "expr": "aave_bot_collaterals{pair=\"stMATIC-WMATIC-polygon\",bin=\"4\"} / on (pair,bin) group_left aave_bot_collaterals:total",
           "interval": "",
           "legendFormat": "{{zone}}",
           "refId": "A"
         }
       ],
-      "title": "Bin 3 zones overview",
+      "title": "Bin 4 zones overview",
       "type": "timeseries"
     }
   ],
