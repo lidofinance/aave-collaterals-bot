@@ -17,6 +17,11 @@ COLLATERALS = Gauge(
     "AAVE collaterals distribution",
     ("pair", "zone", "bin"),
 )
+VALUES = Gauge(
+    f"{PREFIX}_collaterals_values",
+    "AAVE collaterals values distribution",
+    ("pair", "zone", "bin"),
+)
 PROCESSING_COMPLETED = Gauge(
     f"{PREFIX}_processing_finished_seconds",
     "Last one successful parsing cycle completion timestamp",

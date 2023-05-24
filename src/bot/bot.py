@@ -11,7 +11,7 @@ from .aaveparser import fetch
 from .analytics import get_zones_values
 from .config import MAIN_ERROR_COOLDOWN, PARSE_INTERVAL
 from .eth import w3
-from .metrics import APP_ERRORS, COLLATERALS, FETCH_DURATION, NETWORK, PROCESSING_COMPLETED
+from .metrics import APP_ERRORS, COLLATERALS, FETCH_DURATION, NETWORK, PROCESSING_COMPLETED, VALUES
 from .structs import ChainId
 from .worker import Worker, arbwstETH, astETH, awstETH, polStMATIC
 
@@ -65,11 +65,13 @@ class AAVEBot:  # pylint: disable=too-few-public-methods
             with APP_ERRORS.labels("analytics").count_exceptions():
                 values = get_zones_values(df, bin_)
             for zone, v in values.items():
-                COLLATERALS.labels(w.pair.name, zone, idx + 1).set(v)
+                COLLATERALS.labels(w.pair.name, zone, idx + 1).set(v.amount)
+                VALUES.labels(w.pair.name, zone, idx + 1).set(v.value)
 
             bin_alias = f"{w.pair.name}-{idx + 1}"
             self.log.info("Bin %s distribution:\n%s", bin_alias, self.pprint.pformat(values))
-            self.log.info("Total amount locked in bin %s: %d", bin_alias, sum(values.values()))
+            self.log.info("Total amount locked in bin %s: %d", bin_alias, sum(v.amount for v in values.values()))
+            self.log.info("Total value locked in bin %s: %d", bin_alias, sum(v.value for v in values.values()))
 
     def _on_error(self, ex: Exception) -> None:
         self.log.error("An error occurred", exc_info=ex)

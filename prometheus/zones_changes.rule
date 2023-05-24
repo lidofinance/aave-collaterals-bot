@@ -62,11 +62,12 @@ groups:
 
             - **📊 Share**
             - **🏦 Amount**
-            -
+            - **💵 USD value**
 
             - {{ .Value | humanizePercentage }} in C+D+liquidation
             - {{ $amount }} {{ $asset }}
-            -
+            - {{ with printf "sum (aave_bot_collaterals_values{pair=%q,bin=%q,zone=~'C|D|liquidation'})" .Labels.pair
+              .Labels.bin | query | first | value | printf "%.1f" }}${{ . }}{{ end }}
             {{ with
               printf "aave_bot_collaterals:percent{pair=%q,bin=%q,zone=~'C|D|liquidation'}" .Labels.pair .Labels.bin |
               query | sortByLabel "zone" }}{{ range .
@@ -74,7 +75,8 @@ groups:
             - {{ .Value | humanizePercentage }} in {{ .Labels.zone }}
             - {{ with printf "aave_bot_collaterals{pair=%q,bin=%q,zone=%q}" .Labels.pair .Labels.bin .Labels.zone |
             query }}{{ $v := . | first | value | printf "%.1f" }}{{ $v }} {{ $asset }}{{ end }}
-            -
+            - {{ with printf "aave_bot_collaterals_values{pair=%q,bin=%q,zone=%q}" .Labels.pair .Labels.bin
+              .Labels.zone | query | first | value | printf "%.1f" }}${{ . }}{{ end }}
             {{ end }}{{ end }}
 
       - alert: AAVEHighAmountCollateralsUnderRisk
