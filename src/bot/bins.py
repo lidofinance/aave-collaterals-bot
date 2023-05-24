@@ -55,7 +55,7 @@ def wsteth_bin1_1(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df = df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0 and emode == True")
+    df = df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0 and emode == 1")
 
     return df
 
@@ -65,7 +65,7 @@ def wsteth_bin1_2(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    df = df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0 and emode == False")
+    df = df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0 and emode == 0")
 
     return df
 
@@ -94,7 +94,7 @@ def wsteth_bin3(df: pd.DataFrame) -> pd.DataFrame:
 
 WSTETH: list[Bin] = [
     (
-        (1.42, 1.21, 1.14, 1.07, 1.03, 1.00),
+        (1.42, 1.21, 1.14, 1.03, 1.01, 1.00),
         wsteth_bin1_1,
     ),
     (
@@ -112,12 +112,22 @@ WSTETH: list[Bin] = [
 ]
 
 
-def st_matic_bin1(df: pd.DataFrame) -> pd.DataFrame:
-    """AAVE users with >=80% collaterals - stMATIC and >=80% debt - MATIC"""
+def st_matic_bin1_1(df: pd.DataFrame) -> pd.DataFrame:
+    """Users with e-mode and with >=80% collateral - stMATIC and  >=80% debt - MATIC"""
 
     df = df.copy()
 
-    df.query("diff_collateral < 0.2 and diff_debt < 0.2 and borrowed > 0", inplace=True)
+    df.query("diff_collateral <= 0.2 and diff_debt <= 0.2 and borrowed > 0 and emode == 2", inplace=True)
+
+    return df
+
+
+def st_matic_bin1_2(df: pd.DataFrame) -> pd.DataFrame:
+    """Users without e-mode and with >=80% collateral - stMATIC and  >=80% debt - MATIC"""
+
+    df = df.copy()
+
+    df.query("diff_collateral <= 0.2 and diff_debt <= 0.2 and borrowed > 0 and emode != 2", inplace=True)
 
     return df
 
@@ -135,16 +145,23 @@ def st_matic_bin2(df: pd.DataFrame) -> pd.DataFrame:
 def st_matic_bin3(df: pd.DataFrame) -> pd.DataFrame:
     """All the others AAVE users with stMATIC collateral"""
 
-    bin1_df = st_matic_bin1(df)
-    bin2_df = st_matic_bin2(df)
+    others = (
+        st_matic_bin1_1(df),
+        st_matic_bin1_2(df),
+        st_matic_bin2(df),
+    )
 
-    return pd.DataFrame(pd.concat([df, bin1_df, bin2_df]).drop_duplicates(keep=False))
+    return pd.DataFrame(pd.concat([df, *others]).drop_duplicates(keep=False))
 
 
 STMATIC: list[Bin] = [
     (
-        (1.42, 1.21, 1.14, 1.07, 1.01, 1.00),
-        st_matic_bin1,
+        (1.42, 1.21, 1.14, 1.03, 1.01, 1.00),
+        st_matic_bin1_1,
+    ),
+    (
+        (1.42, 1.21, 1.14, 1.07, 1.03, 1.00),
+        st_matic_bin1_2,
     ),
     (
         (2.50, 1.75, 1.50, 1.25, 1.10, 1.00),
