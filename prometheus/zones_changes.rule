@@ -21,7 +21,7 @@ groups:
         annotations:
           summary: High percent of AAVE {{ .Labels.pair }} bin {{ .Labels.bin }} collaterals in dangerous zone 🔥
           description: &high-amount-under-risk-description >-
-            {{- $asset := .Labels.pair | reReplaceAll `(\w+)-(\w+)` "$1" -}}
+            {{- $asset := .Labels.pair | reReplaceAll `(\w+)-(\w+)-?(\w)*` "$1" -}}
 
             {{- if eq .Labels.pair "stETH-WETH" -}}
 
@@ -58,7 +58,7 @@ groups:
               printf "aave_bot_collaterals:risky{pair=%q,bin=%q}" .Labels.pair .Labels.bin | query |
               first | value | printf "%.1f" -}}
 
-            {{- $asset := .Labels.pair | reReplaceAll `(\w+)-(\w+)` "$1" -}}
+            {{- $asset := .Labels.pair | reReplaceAll `(\w+)-(\w+)-?(\w)*` "$1" -}}
 
             - **📊 Share**
             - **🏦 Amount**
