@@ -8,6 +8,9 @@ groups:
       - record: aave_bot_collaterals:risky
         expr: sum (aave_bot_collaterals{zone=~"C|D|liquidation"}) by (pair, bin)
 
+      - record: aave_bot_collaterals:risky:percent
+        expr: aave_bot_collaterals:risky / aave_bot_collaterals:total
+
       - record: aave_bot_collaterals:percent
         expr: aave_bot_collaterals / on (pair,bin) group_left aave_bot_collaterals:total
 
