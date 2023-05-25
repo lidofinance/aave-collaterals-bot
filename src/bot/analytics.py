@@ -1,8 +1,7 @@
 """Analytics methods"""
 
 import logging
-from contextlib import suppress
-from typing import Callable, TypeAlias
+from typing import Callable, NamedTuple, TypeAlias
 
 import pandas as pd
 
@@ -20,6 +19,13 @@ Thresholds: TypeAlias = tuple[
 
 Filter: TypeAlias = Callable[[pd.DataFrame], pd.DataFrame] | str
 Bin: TypeAlias = tuple[Thresholds, Filter]
+
+
+class RisksResult(NamedTuple):
+    """Result of risk calculation"""
+
+    amount: float = 0.0
+    value: float = 0.0
 
 
 RISK_LABELS = ["A", "B+", "B", "B-", "C", "D", "liquidation"]
@@ -70,8 +76,18 @@ def get_distr(df: pd.DataFrame) -> pd.DataFrame:
     risk_distr = df.pivot_table(index="risk_rating", values="amount", aggfunc=["sum", "count"])
     risk_distr.columns = pd.Index(("asset", "cnt"))
     risk_distr["percent"] = (risk_distr["asset"] / risk_distr["asset"].sum()) * 100
+    risk_distr["value"] = risk_distr["asset"] * _get_supply_price(df)
 
     return risk_distr
+
+
+def _get_supply_price(df: pd.DataFrame) -> float:
+    """Get supply price from dataframe"""
+
+    if "supply_price" not in df:
+        return 0.0
+
+    return df["supply_price"].iloc[0]
 
 
 def _apply_df_query_filter(df: pd.DataFrame, filter_: Filter) -> pd.DataFrame:
@@ -86,7 +102,7 @@ def _apply_df_query_filter(df: pd.DataFrame, filter_: Filter) -> pd.DataFrame:
     return df
 
 
-def get_zones_values(df: pd.DataFrame, bin_: Bin) -> dict[str, float]:
+def get_zones_values(df: pd.DataFrame, bin_: Bin) -> dict[str, RisksResult]:
     """Calculate risk distribution.
     Almost as is from related jupyter notebook."""
 
@@ -95,17 +111,20 @@ def get_zones_values(df: pd.DataFrame, bin_: Bin) -> dict[str, float]:
     df = prepare_data(df)
     df = _apply_df_query_filter(df, filter_)
 
+    results: dict[str, RisksResult] = {label: RisksResult(0.0, 0.0) for label in RISK_LABELS}
     if df.empty:
-        return {label: 0.0 for label in RISK_LABELS}
+        return results
 
     risks = get_risks(df, thresholds)
     risk_distr = get_distr(risks)
 
-    result = {}
     for label in RISK_LABELS:
-        value: float = 0
-        with suppress(KeyError):
-            value = risk_distr.at[label, "asset"]
-        result[label] = value
+        if label not in risk_distr.index:
+            continue
 
-    return result
+        results[label] = RisksResult(
+            risk_distr.at[label, "asset"],
+            risk_distr.at[label, "value"],
+        )
+
+    return results

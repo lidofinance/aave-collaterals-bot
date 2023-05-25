@@ -1,6 +1,6 @@
 ---
 groups:
-  - name: aaveBot
+  - name: AAVEBot
     rules:
       - record: aave_bot_collaterals:total
         expr: sum (aave_bot_collaterals) by (pair, bin)
@@ -11,24 +11,31 @@ groups:
       - record: aave_bot_collaterals:risky:percent
         expr: aave_bot_collaterals:risky / aave_bot_collaterals:total
 
-      - alert: HighAmountCollateralsUnderRisk
-        expr: aave_bot_collaterals:risky:percent > 0.15
+      - record: aave_bot_collaterals:percent
+        expr: aave_bot_collaterals / on (pair,bin) group_left aave_bot_collaterals:total
+
+      - alert: AAVEHighAmountCollateralsUnderRisk
+        expr: >
+          sum (aave_bot_collaterals:percent{zone=~"C|D|liquidation"}) by (pair,bin) > 0.15
+          and {pair="stETH-WETH"}
         for: 30m
         labels:
           severity: high
         annotations:
           summary: High percent of AAVE {{ .Labels.pair }} bin {{ .Labels.bin }} collaterals in dangerous zone 🔥
-          description: >-
+          description: &high-amount-under-risk-description >-
+            {{- $asset := .Labels.pair | reReplaceAll `(\w+)-(\w+)-?(\w)*` "$1" -}}
+
             {{- if eq .Labels.pair "stETH-WETH" -}}
 
             {{- if eq .Labels.bin "1" -}}
-            > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
+            > AAVE users with >=80% collaterals in {{ $asset }} and >=80% debt in ETH
             {{- end -}}
             {{- if eq .Labels.bin "2" -}}
-            > AAVE users with stETH collateral and >=80% debt not in ETH
+            > AAVE users with {{ $asset }} collateral and >=80% debt not in ETH
             {{- end -}}
             {{- if eq .Labels.bin "3" -}}
-            > AAVE users with less significant stETH collateral amount
+            > AAVE users with less significant {{ $asset }} collateral amount
             {{- end -}}
 
             {{- end }}
@@ -36,26 +43,76 @@ groups:
             {{- if eq .Labels.pair "wstETH-WETH" -}}
 
             {{- if eq .Labels.bin "1" -}}
-            > Users with e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
+            > Users with e-mode and with >=80% of collateral - {{ $asset }}, and >= 80% of debt - ETH
             {{- end -}}
             {{- if eq .Labels.bin "2" -}}
-            > Users without e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
+            > Users without e-mode and with >=80% of collateral - {{ $asset }}, and >= 80% of debt - ETH
             {{- end -}}
             {{- if eq .Labels.bin "3" -}}
-            > Users with wstETH collateral and >=80% debt - not ETH
+            > Users with {{ $asset }} collateral and >=80% debt - not ETH
             {{- end -}}
             {{- if eq .Labels.bin "4" -}}
-            > All other AAVE users with wstETH collateral
+            > All other AAVE users with {{ $asset }} collateral
             {{- end -}}
 
             {{- end }}
+          inline_fields: &high-amount-under-risk-table |-
+            {{- $amount :=
+              printf "aave_bot_collaterals:risky{pair=%q,bin=%q}" .Labels.pair .Labels.bin | query |
+              first | value | printf "%.1f" -}}
 
-            It is {{ $value | humanizePercentage }} ({{
-              with printf "aave_bot_collaterals:risky{pair=%q,bin=%q}" .Labels.pair .Labels.bin | query
-            }}{{ . | first | value | printf "%.1f" }}{{ end }}
-            {{ reReplaceAll `(\w+)-(\w+)` "$1" $labels.pair }})
-            of bin {{ .Labels.bin }} in risky zone!
+            {{- $asset := .Labels.pair | reReplaceAll `(\w+)-(\w+)-?(\w)*` "$1" -}}
 
+            - **📊 Share**
+            - **🏦 Amount**
+            - **💵 USD value**
+
+            - {{ .Value | humanizePercentage }} in C+D+liquidation
+            - {{ $amount }} {{ $asset }}
+            - {{ with printf "sum (aave_bot_collaterals_values{pair=%q,bin=%q,zone=~'C|D|liquidation'})" .Labels.pair
+              .Labels.bin | query | first | value | printf "%.1f" }}${{ . }}{{ end }}
+            {{ with
+              printf "aave_bot_collaterals:percent{pair=%q,bin=%q,zone=~'C|D|liquidation'}" .Labels.pair .Labels.bin |
+              query | sortByLabel "zone" }}{{ range .
+            }}
+            - {{ .Value | humanizePercentage }} in {{ .Labels.zone }}
+            - {{ with printf "aave_bot_collaterals{pair=%q,bin=%q,zone=%q}" .Labels.pair .Labels.bin .Labels.zone |
+            query }}{{ $v := . | first | value | printf "%.1f" }}{{ $v }} {{ $asset }}{{ end }}
+            - {{ with printf "aave_bot_collaterals_values{pair=%q,bin=%q,zone=%q}" .Labels.pair .Labels.bin
+              .Labels.zone | query | first | value | printf "%.1f" }}${{ . }}{{ end }}
+            {{ end }}{{ end }}
+
+      - alert: AAVEHighAmountCollateralsUnderRisk
+        expr: >
+          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"wstETH.+",zone="D"} > 0.10 and on (pair,bin,zone)
+          aave_bot_collaterals > 100
+        for: 30m
+        labels:
+          severity: high
+        annotations:
+          summary: High percent of AAVE {{ .Labels.pair }} bin {{ .Labels.bin }} collaterals in dangerous zone 🔥
+          description: *high-amount-under-risk-description
+          inline_fields: *high-amount-under-risk-table
+
+      - alert: AAVEHighAmountCollateralsUnderRisk
+        expr: aave_bot_collaterals:percent{bin=~"2|3|4",pair!~"(w)?stETH.+",zone="D"} > 0.10
+        for: 30m
+        labels:
+          severity: high
+        annotations:
+          summary: High percent of AAVE {{ .Labels.pair }} bin {{ .Labels.bin }} collaterals in dangerous zone 🔥
+          description: *high-amount-under-risk-description
+          inline_fields: *high-amount-under-risk-table
+
+      - alert: AAVEHighAmountCollateralsUnderRisk
+        expr: aave_bot_collaterals:percent{bin="1",pair!~"stETH.+",zone="D"} > 0.05
+        for: 30m
+        labels:
+          severity: high
+        annotations:
+          summary: High percent of AAVE {{ .Labels.pair }} bin {{ .Labels.bin }} collaterals in dangerous zone 🔥
+          description: *high-amount-under-risk-description
+          inline_fields: *high-amount-under-risk-table
 
       - alert: AAVECollateralsLiquidation
         expr: aave_bot_collaterals{zone="liquidation"} > 0
@@ -94,5 +151,3 @@ groups:
             {{- end -}}
 
             {{- end }}
-
-# vim: set ts=2 sw=2 ft=yaml:

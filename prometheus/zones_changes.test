@@ -3,30 +3,66 @@ rule_files:
   - "zones_changes.rule"
 evaluation_interval: 1m
 tests:
-  # HighAmountCollateralsUnderRisk
+  # AAVEHighAmountCollateralsUnderRisk
   - interval: 5m
     input_series:
       - series: aave_bot_collaterals{zone="OTHER", bin="1", pair="stETH-WETH"}
         values: 80+0x10
+      - series: aave_bot_collaterals_values{zone="OTHER", bin="1", pair="stETH-WETH"}
+        values: 80+0x10
+      - series: aave_bot_collaterals{zone="C", bin="1", pair="stETH-WETH"}
+        values: 10+0x10
+      - series: aave_bot_collaterals_values{zone="C", bin="1", pair="stETH-WETH"}
+        values: 10+0x10
       - series: aave_bot_collaterals{zone="D", bin="1", pair="stETH-WETH"}
-        values: 20+0x10
+        values: 10+0x10
+      - series: aave_bot_collaterals_values{zone="D", bin="1", pair="stETH-WETH"}
+        values: 10+0x10
+      - series: aave_bot_collaterals{zone="liquidation", bin="1", pair="stETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="liquidation", bin="1", pair="stETH-WETH"}
+        values: 0+0x10
 
       - series: aave_bot_collaterals{zone="OTHER", bin="2", pair="stETH-WETH"}
         values: 83+0x10
+      - series: aave_bot_collaterals_values{zone="OTHER", bin="2", pair="stETH-WETH"}
+        values: 83+0x10
+      - series: aave_bot_collaterals{zone="C", bin="2", pair="stETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="C", bin="2", pair="stETH-WETH"}
+        values: 0+0x10
       - series: aave_bot_collaterals{zone="D", bin="2", pair="stETH-WETH"}
         values: 17+0x10
+      - series: aave_bot_collaterals_values{zone="D", bin="2", pair="stETH-WETH"}
+        values: 17+0x10
+      - series: aave_bot_collaterals{zone="liquidation", bin="2", pair="stETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="liquidation", bin="2", pair="stETH-WETH"}
+        values: 0+0x10
 
       - series: aave_bot_collaterals{zone="OTHER", bin="3", pair="stETH-WETH"}
         values: 90+0x10
+      - series: aave_bot_collaterals_values{zone="OTHER", bin="3", pair="stETH-WETH"}
+        values: 90+0x10
+      - series: aave_bot_collaterals{zone="C", bin="3", pair="stETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="C", bin="3", pair="stETH-WETH"}
+        values: 0+0x10
       - series: aave_bot_collaterals{zone="D", bin="3", pair="stETH-WETH"}
         values: 10+0x10
+      - series: aave_bot_collaterals_values{zone="D", bin="3", pair="stETH-WETH"}
+        values: 10+0x10
+      - series: aave_bot_collaterals{zone="liquidation", bin="3", pair="stETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="liquidation", bin="3", pair="stETH-WETH"}
+        values: 0+0x10
     alert_rule_test:
       # no fire
       - eval_time: 5m
-        alertname: HighAmountCollateralsUnderRisk
+        alertname: AAVEHighAmountCollateralsUnderRisk
 
       - eval_time: 30m
-        alertname: HighAmountCollateralsUnderRisk
+        alertname: AAVEHighAmountCollateralsUnderRisk
         exp_alerts:
           # Bin 1
           - exp_labels:
@@ -37,8 +73,27 @@ tests:
               summary: High percent of AAVE stETH-WETH bin 1 collaterals in dangerous zone 🔥
               description: >-
                 > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                - **💵 USD value**
 
-                It is 20% (20.0 stETH) of bin 1 in risky zone!
+                - 20% in C+D+liquidation
+                - 20.0 stETH
+                - $20.0
+
+                - 10% in C
+                - 10.0 stETH
+                - $10.0
+
+                - 10% in D
+                - 10.0 stETH
+                - $10.0
+
+                - 0% in liquidation
+                - 0.0 stETH
+                - $0.0
+
           # Bin 2
           - exp_labels:
               pair: stETH-WETH
@@ -48,8 +103,140 @@ tests:
               summary: High percent of AAVE stETH-WETH bin 2 collaterals in dangerous zone 🔥
               description: >-
                 > AAVE users with stETH collateral and >=80% debt not in ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                - **💵 USD value**
 
-                It is 17% (17.0 stETH) of bin 2 in risky zone!
+                - 17% in C+D+liquidation
+                - 17.0 stETH
+                - $17.0
+
+                - 0% in C
+                - 0.0 stETH
+                - $0.0
+
+                - 17% in D
+                - 17.0 stETH
+                - $17.0
+
+                - 0% in liquidation
+                - 0.0 stETH
+                - $0.0
+
+  # AAVEHighAmountCollateralsUnderRisk
+  - interval: 5m
+    input_series:
+      - series: aave_bot_collaterals{zone="OTHER", bin="1", pair="wstETH-WETH"}
+        values: 94+0x10
+      - series: aave_bot_collaterals_values{zone="OTHER", bin="1", pair="wstETH-WETH"}
+        values: 94+0x10
+      - series: aave_bot_collaterals{zone="C", bin="1", pair="wstETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="C", bin="1", pair="wstETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals{zone="D", bin="1", pair="wstETH-WETH"}
+        values: 6+0x10
+      - series: aave_bot_collaterals_values{zone="D", bin="1", pair="wstETH-WETH"}
+        values: 6+0x10
+      - series: aave_bot_collaterals{zone="liquidation", bin="1", pair="wstETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="liquidation", bin="1", pair="wstETH-WETH"}
+        values: 0+0x10
+
+      - series: aave_bot_collaterals{zone="OTHER", bin="2", pair="wstETH-WETH"}
+        values: 880+0x10
+      - series: aave_bot_collaterals_values{zone="OTHER", bin="2", pair="wstETH-WETH"}
+        values: 880+0x10
+      - series: aave_bot_collaterals{zone="C", bin="2", pair="wstETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="C", bin="2", pair="wstETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals{zone="D", bin="2", pair="wstETH-WETH"}
+        values: 120+0x10
+      - series: aave_bot_collaterals_values{zone="D", bin="2", pair="wstETH-WETH"}
+        values: 120+0x10
+      - series: aave_bot_collaterals{zone="liquidation", bin="2", pair="wstETH-WETH"}
+        values: 0+0x10
+      - series: aave_bot_collaterals_values{zone="liquidation", bin="2", pair="wstETH-WETH"}
+        values: 0+0x10
+
+      - series: aave_bot_collaterals{zone="OTHER", bin="1", pair="wstETH-WETH-arb"}
+        values: 96+0x10
+      - series: aave_bot_collaterals_values{zone="OTHER", bin="1", pair="wstETH-WETH-arb"}
+        values: 96+0x10
+      - series: aave_bot_collaterals{zone="D", bin="1", pair="wstETH-WETH-arb"}
+        values: 4+0x10
+      - series: aave_bot_collaterals_values{zone="D", bin="1", pair="wstETH-WETH-arb"}
+        values: 4+0x10
+
+    alert_rule_test:
+      # no fire
+      - eval_time: 5m
+        alertname: AAVEHighAmountCollateralsUnderRisk
+
+      - eval_time: 30m
+        alertname: AAVEHighAmountCollateralsUnderRisk
+        exp_alerts:
+          - exp_labels:
+              pair: wstETH-WETH
+              zone: D
+              bin: 1
+              severity: high
+            exp_annotations:
+              summary: High percent of AAVE wstETH-WETH bin 1 collaterals in dangerous zone 🔥
+              description: >-
+                > Users with e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                - **💵 USD value**
+
+                - 6% in C+D+liquidation
+                - 6.0 wstETH
+                - $6.0
+
+                - 0% in C
+                - 0.0 wstETH
+                - $0.0
+
+                - 6% in D
+                - 6.0 wstETH
+                - $6.0
+
+                - 0% in liquidation
+                - 0.0 wstETH
+                - $0.0
+
+          - exp_labels:
+              pair: wstETH-WETH
+              zone: D
+              bin: 2
+              severity: high
+            exp_annotations:
+              summary: High percent of AAVE wstETH-WETH bin 2 collaterals in dangerous zone 🔥
+              description: >-
+                > Users without e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
+              inline_fields: |
+                - **📊 Share**
+                - **🏦 Amount**
+                - **💵 USD value**
+
+                - 12% in C+D+liquidation
+                - 120.0 wstETH
+                - $120.0
+
+                - 0% in C
+                - 0.0 wstETH
+                - $0.0
+
+                - 12% in D
+                - 120.0 wstETH
+                - $120.0
+
+                - 0% in liquidation
+                - 0.0 wstETH
+                - $0.0
 
   # AAVECollateralsLiquidation
   - interval: 5m

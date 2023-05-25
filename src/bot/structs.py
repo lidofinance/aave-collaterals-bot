@@ -211,7 +211,7 @@ class UserInfo(TypedDict):
     liquidation_threshold: int
     ltv: int
     healthfactor: float
-    emode: bool | None
+    emode: int | None
 
 
 @dataclass
@@ -250,7 +250,7 @@ class Market:
         if isinstance(self.lending_pool, LendingPoolV3):
             try:
                 with suppress(ContractLogicError):
-                    return bool(self.lending_pool.functions.getUserEMode(user).call(block_identifier=block))
+                    return self.lending_pool.functions.getUserEMode(user).call(block_identifier=block)
             except ValueError as ex:
                 if "execution error" not in str(ex):  # nethermind?
                     raise
