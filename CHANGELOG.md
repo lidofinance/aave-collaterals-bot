@@ -1,3 +1,21 @@
+# [1.11.0](https://github.com/lidofinance/aave-collaterals-bot/compare/1.10.2...1.11.0) (2023-05-25)
+
+
+### Bug Fixes
+
+* **bins:** update bins params ([8d942b3](https://github.com/lidofinance/aave-collaterals-bot/commit/8d942b3087573f75811e4b1db555ae9841776b6a))
+* **prometheus:** make regexp match the network suffix ([93f96a2](https://github.com/lidofinance/aave-collaterals-bot/commit/93f96a297cca440c58cd846329199c91fd2eaac6))
+* **prometheus:** restore rule used by grafana ([808df47](https://github.com/lidofinance/aave-collaterals-bot/commit/808df473aa0d2a0836d8de3d4683f7e181ac1683))
+
+
+### Features
+
+* expose USD values of collaterals ([a7f10d4](https://github.com/lidofinance/aave-collaterals-bot/commit/a7f10d4114394a134fb0a433e4dc3c5503e640db))
+* **prometheus:** new alerting rules ([cc83993](https://github.com/lidofinance/aave-collaterals-bot/commit/cc83993740796c1570ab02c22cd70b30d4ad57bc))
+* **prometheus:** use inline_fields annotation to build a table ([eb3cb47](https://github.com/lidofinance/aave-collaterals-bot/commit/eb3cb477ecfdd9b8ad44af19da6ec017f498957f))
+
+
+
 ## [1.10.2](https://github.com/lidofinance/aave-collaterals-bot/compare/1.10.1...1.10.2) (2023-04-17)
 
 
@@ -113,15 +131,6 @@
 * **grafana:** add status dashboard ([3e09bca](https://github.com/lidofinance/aave-collaterals-bot/commit/3e09bca1e580e6a8e7c1ed27f5a51a723ec5df2b))
 * **parser:** get coin price within the given timestamp ([d05bb43](https://github.com/lidofinance/aave-collaterals-bot/commit/d05bb4348f2d7dade6decb0421c8f24d4a25df3c))
 * **parsing:** parse eth debt from blockchain ([3903ac6](https://github.com/lidofinance/aave-collaterals-bot/commit/3903ac64b055c4757233f27edbbfa5edf5e9a7d8))
-
-
-
-## [1.4.1](https://github.com/lidofinance/aave-collaterals-bot/compare/1.4.0...1.4.1) (2022-06-20)
-
-
-### Bug Fixes
-
-* **analytics:** fix mistakes in bins definitions ([f2ec77a](https://github.com/lidofinance/aave-collaterals-bot/commit/f2ec77ad31fbc287956ad3baaf62037aaa9e301e))
 
 
 
