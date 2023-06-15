@@ -71,6 +71,11 @@ class ERC20Like(IsContract):
         """Proxy to ERC20 symbol() method"""
         return self.contract.functions.symbol().call()
 
+    def balance(self, user: str, block: BlockIdentifier) -> float:
+        """Get user balance"""
+        user = w3.toChecksumAddress(user)
+        return self.contract.functions.balanceOf(user).call(block_identifier=block) / self.precision
+
 
 @dataclass
 class SupplyToken(ERC20Like):
@@ -267,6 +272,8 @@ class PoolPosition:
     supply_token: SupplyToken
     debt_token: DebtToken
 
+    extra_tokens: list[SupplyToken] = field(default_factory=list)
+
     balance_threshold: float = 0
     chain_id: ChainId = ChainId.HOMESTEAD
 
@@ -304,6 +311,10 @@ class PoolPosition:
     def get_debt_token_price(self, block: BlockIdentifier) -> float:
         """Get debt token price in base units"""
         return self.amm.get_asset_price(self.debt_token.address, block)
+
+    def get_token_price(self, token: str, block: BlockIdentifier) -> float:
+        """Get token price in base units"""
+        return self.amm.get_asset_price(token, block)
 
 
 @dataclass

@@ -10,7 +10,7 @@ from web3.types import BlockData, BlockIdentifier
 
 from .config import TRANSFER_EVENTS_BATCH
 from .eth import w3
-from .structs import Context, PoolPosition, UserInfo
+from .structs import Context, ERC20Like, PoolPosition, UserInfo
 
 log = logging.getLogger(__name__)
 
@@ -25,9 +25,9 @@ def get_user_stats(ctx: Context, pair: PoolPosition, user: str) -> UserInfo:
 
 
 @unsync
-def get_atoken_balance(ctx: Context, pair: PoolPosition, user: str) -> float:
+def get_atoken_balance(ctx: Context, a_token: ERC20Like, user: str) -> float:
     """Get user's aToken balance"""
-    return pair.get_total_supply(user, ctx.curr_block)
+    return a_token.balance(user, ctx.curr_block)
 
 
 @unsync
@@ -69,8 +69,8 @@ def find_new_atoken_holders(ctx: Context, pair: PoolPosition) -> None:
 
 
 def get_holders_balances(ctx: Context, pair: PoolPosition) -> Iterable[tuple[str, float]]:
-    """Get holders with balance above the threshold"""
-    tasks = [(h, get_atoken_balance(ctx, pair, h)) for h in ctx.holders]
+    """Get balances of AToken holders"""
+    tasks = [(h, get_atoken_balance(ctx, pair.supply_token.a_token, h)) for h in ctx.holders]
     for holder, task in tasks:
         balance = task.result()  # type: ignore
         yield (holder, balance)
@@ -131,7 +131,24 @@ def fetch(ctx: Context, pair: PoolPosition) -> pd.DataFrame | None:
             buf.append({"user": user, "borrowed": debt})
         return buf
 
-    tasks = [_get_stats(), _get_debt()]
+    @unsync
+    def _get_extra_amount():
+
+        prices = tuple(pair.get_token_price(t.address, ctx.curr_block) for t in pair.extra_tokens)
+
+        @unsync
+        def balances(user: str) -> tuple[float, ...]:
+            return tuple(t.a_token.balance(user, ctx.curr_block) for t in pair.extra_tokens)
+
+        buf = []
+        tasks = [(user, balances(user)) for user in df["user"]]
+        for user, task in tasks:
+            user_balances: tuple[float, ...] = task.result()  # type: ignore
+            extra_amount = sum(b * p for b, p in zip(user_balances, prices))
+            buf.append({"user": user, "extra_amount": extra_amount})
+        return buf
+
+    tasks = [_get_stats(), _get_debt(), _get_extra_amount()]
     parts = [pd.DataFrame(task.result()) for task in tasks]  # type: ignore # pylint: disable=no-member
 
     df["supply_price"] = pair.get_supply_token_price(ctx.curr_block)

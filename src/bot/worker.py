@@ -61,6 +61,16 @@ awstETH = Worker(
             stable=ERC20Like(address="0x102633152313C81cD80419b6EcF66d14Ad68949A"),
             var=ERC20Like(address="0xeA51d7853EEFb32b6ee06b1C12E6dcCA88Be0fFE"),
         ),
+        extra_tokens=[
+            SupplyToken(  # rETH
+                a_token=ERC20Like("0xCc9EE9483f662091a1de4795249E24aC0aC2630f"),
+                address="0xae78736Cd615f374D3085123A210448E74Fc6393",
+            ),
+            SupplyToken(  # cbETH
+                a_token=ERC20Like("0x977b6fc5dE62598B08C85AC8Cf2b745874E8b78c"),
+                address="0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
+            ),
+        ],
         balance_threshold=0,
     ),
     ctx=Context(init_block=16496795),
