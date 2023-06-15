@@ -26,7 +26,7 @@ groups:
           description: &high-amount-under-risk-description >-
             {{- $asset := .Labels.pair | reReplaceAll `(\w+)-(\w+)-?(\w)*` "$1" -}}
 
-            {{- if eq .Labels.pair "stETH-WETH" -}}
+            {{- if eq $asset "stETH" -}}
 
             {{- if eq .Labels.bin "1" -}}
             > AAVE users with >=80% collaterals in {{ $asset }} and >=80% debt in ETH
@@ -40,7 +40,7 @@ groups:
 
             {{- end }}
 
-            {{- if eq .Labels.pair "wstETH-WETH" -}}
+            {{- if eq $asset "wstETH" -}}
 
             {{- if eq .Labels.bin "1" -}}
             > Users with e-mode and with >=80% of collateral - {{ $asset }}, and >= 80% of debt - ETH
@@ -50,6 +50,23 @@ groups:
             {{- end -}}
             {{- if eq .Labels.bin "3" -}}
             > Users with {{ $asset }} collateral and >=80% debt - not ETH
+            {{- end -}}
+            {{- if eq .Labels.bin "4" -}}
+            > All other AAVE users with {{ $asset }} collateral
+            {{- end -}}
+
+            {{- end }}
+
+            {{- if eq $asset "stMATIC" -}}
+
+            {{- if eq .Labels.bin "1" -}}
+            > Users with e-mode and with >=80% collateral - {{ $asset }} and  >=80% debt - MATIC
+            {{- end -}}
+            {{- if eq .Labels.bin "2" -}}
+            > Users without e-mode and with >=80% collateral - {{ $asset }} and  >=80% debt - MATIC
+            {{- end -}}
+            {{- if eq .Labels.bin "3" -}}
+            > AAVE users with {{ $asset }} collateral and >=80% debt - not MATIC
             {{- end -}}
             {{- if eq .Labels.bin "4" -}}
             > All other AAVE users with {{ $asset }} collateral
@@ -84,8 +101,8 @@ groups:
 
       - alert: AAVEHighAmountCollateralsUnderRisk
         expr: >
-          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"wstETH.+",zone="D"} > 0.10 and on (pair,bin,zone)
-          aave_bot_collaterals > 100
+          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"wstETH.+",zone="D"} >= 0.10 and on (pair,bin,zone)
+          aave_bot_collaterals >= 100
         for: 30m
         labels:
           severity: high
@@ -95,7 +112,9 @@ groups:
           inline_fields: *high-amount-under-risk-table
 
       - alert: AAVEHighAmountCollateralsUnderRisk
-        expr: aave_bot_collaterals:percent{bin=~"2|3|4",pair!~"(w)?stETH.+",zone="D"} > 0.10
+        expr: >
+          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"stMATIC.+",zone="D"} >= 0.10 and on (pair,bin,zone)
+          aave_bot_collaterals >= 18000
         for: 30m
         labels:
           severity: high
@@ -105,7 +124,7 @@ groups:
           inline_fields: *high-amount-under-risk-table
 
       - alert: AAVEHighAmountCollateralsUnderRisk
-        expr: aave_bot_collaterals:percent{bin="1",pair!~"stETH.+",zone="D"} > 0.05
+        expr: aave_bot_collaterals:percent{bin="1",pair!~"stETH.+",zone="D"} >= 0.05
         for: 30m
         labels:
           severity: high
@@ -115,39 +134,17 @@ groups:
           inline_fields: *high-amount-under-risk-table
 
       - alert: AAVECollateralsLiquidation
-        expr: aave_bot_collaterals{zone="liquidation"} > 0
+        expr: aave_bot_collaterals{zone="liquidation",pair!~"stMATIC.+"} > 0
         labels:
           severity: high
         annotations:
           summary: AAVE {{ .Labels.pair }} bin {{ .Labels.bin }} collaterals under liquidation has been detected!
-          description: >-
-            {{- if eq .Labels.pair "stETH-WETH" -}}
+          description: *high-amount-under-risk-description
 
-            {{- if eq .Labels.bin "1" -}}
-            > AAVE users with >=80% collaterals in stETH and >=80% debt in ETH
-            {{- end -}}
-            {{- if eq .Labels.bin "2" -}}
-            > AAVE users with stETH collateral and >=80% debt not in ETH
-            {{- end -}}
-            {{- if eq .Labels.bin "3" -}}
-            > AAVE users with less significant stETH collateral amount
-            {{- end -}}
-
-            {{- end }}
-
-            {{- if eq .Labels.pair "wstETH-WETH" -}}
-
-            {{- if eq .Labels.bin "1" -}}
-            > Users with e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
-            {{- end -}}
-            {{- if eq .Labels.bin "2" -}}
-            > Users without e-mode and with >=80% of collateral - wstETH, and >= 80% of debt - ETH
-            {{- end -}}
-            {{- if eq .Labels.bin "3" -}}
-            > Users with wstETH collateral and >=80% debt - not ETH
-            {{- end -}}
-            {{- if eq .Labels.bin "4" -}}
-            > All other AAVE users with wstETH collateral
-            {{- end -}}
-
-            {{- end }}
+      - alert: AAVECollateralsLiquidation
+        expr: aave_bot_collaterals{zone="liquidation",pair=~"stMATIC.+"} > 0 and aave_bot_collaterals >= 50
+        labels:
+          severity: high
+        annotations:
+          summary: AAVE {{ .Labels.pair }} bin {{ .Labels.bin }} collaterals under liquidation has been detected!
+          description: *high-amount-under-risk-description
