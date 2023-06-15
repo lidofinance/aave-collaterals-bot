@@ -39,7 +39,9 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df.sort_values(by=(["amount"]), ascending=False, inplace=True)
     df.rename(columns={"healthfactor": "healthf"}, inplace=True)
     df.fillna(0, inplace=True)
-    df["diff_collateral"] = abs(df["collateral"] - df["amount"] * df["supply_price"]) / df["collateral"]
+    df["diff_collateral"] = (
+        abs(df["collateral"] - df["amount"] * df["supply_price"] - df["extra_amount"]) / df["collateral"]
+    )
     df["diff_debt"] = abs(df["borrowed"] * df["debt_price"] - df["debt"]) / df["debt"]
 
     return df
