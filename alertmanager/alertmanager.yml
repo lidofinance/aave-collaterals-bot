@@ -1,15 +1,13 @@
 ---
 route:
-
-  group_by: ['alertname', 'pair', 'bin']
+  group_by: ["alertname", "pair", "bin"]
   group_wait: 30s
   group_interval: 6h
   repeat_interval: 11h
-  receiver: 'discord'
+  receiver: "discord"
 
 receivers:
-
-  - name: 'discord'
+  - name: "discord"
     webhook_configs:
-      - url: 'http://discord_bot:5001/'
+      - url: "http://discord_bot:5001/hook/default"
         send_resolved: false
