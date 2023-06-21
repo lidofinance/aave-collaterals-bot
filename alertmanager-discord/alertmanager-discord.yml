@@ -1,0 +1,4 @@
+---
+hooks:
+  - slug: default
+    hook: https://discord.com/api/webhook/123
