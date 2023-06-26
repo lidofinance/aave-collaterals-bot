@@ -76,23 +76,23 @@ tests:
               inline_fields: |
                 - **📊 Share**
                 - **🏦 Amount**
-                - **💵 USD value**
+                -
 
-                - 20% in C+D+liquidation
-                - 20.0 stETH
-                - $20.0
+                - **20% in C+D+liquidation**
+                - **20.0 stETH**
+                -
 
                 - 10% in C
                 - 10.0 stETH
-                - $10.0
+                -
 
                 - 10% in D
                 - 10.0 stETH
-                - $10.0
+                -
 
                 - 0% in liquidation
                 - 0.0 stETH
-                - $0.0
+                -
 
           # Bin 2
           - exp_labels:
@@ -106,23 +106,23 @@ tests:
               inline_fields: |
                 - **📊 Share**
                 - **🏦 Amount**
-                - **💵 USD value**
+                -
 
-                - 17% in C+D+liquidation
-                - 17.0 stETH
-                - $17.0
+                - **17% in C+D+liquidation**
+                - **17.0 stETH**
+                -
 
                 - 0% in C
                 - 0.0 stETH
-                - $0.0
+                -
 
                 - 17% in D
                 - 17.0 stETH
-                - $17.0
+                -
 
                 - 0% in liquidation
                 - 0.0 stETH
-                - $0.0
+                -
 
   # AAVEHighAmountCollateralsUnderRisk
   - interval: 5m
@@ -192,9 +192,9 @@ tests:
                 - **🏦 Amount**
                 - **💵 USD value**
 
-                - 6% in C+D+liquidation
-                - 6.0 wstETH
-                - $6.0
+                - **6% in C+D+liquidation**
+                - **6.0 wstETH**
+                - **$6.0**
 
                 - 0% in C
                 - 0.0 wstETH
@@ -222,9 +222,9 @@ tests:
                 - **🏦 Amount**
                 - **💵 USD value**
 
-                - 12% in C+D+liquidation
-                - 120.0 wstETH
-                - $120.0
+                - **12% in C+D+liquidation**
+                - **120.0 wstETH**
+                - **$120.0**
 
                 - 0% in C
                 - 0.0 wstETH

@@ -16,7 +16,7 @@ groups:
 
       - alert: AAVEHighAmountCollateralsUnderRisk
         expr: >
-          sum (aave_bot_collaterals:percent{zone=~"C|D|liquidation"}) by (pair,bin) > 0.15
+          sum (aave_bot_collaterals:percent{zone=~"C|D|liquidation"}) by (pair,bin) >= 0.15
           and {pair="stETH-WETH"}
         for: 30m
         labels:
@@ -82,12 +82,13 @@ groups:
 
             - **📊 Share**
             - **🏦 Amount**
-            - **💵 USD value**
+            - {{- if ne $asset "stETH" }} **💵 USD value**{{ end }}
 
-            - {{ .Value | humanizePercentage }} in C+D+liquidation
-            - {{ $amount }} {{ $asset }}
-            - {{ with printf "sum (aave_bot_collaterals_values{pair=%q,bin=%q,zone=~'C|D|liquidation'})" .Labels.pair
-              .Labels.bin | query | first | value | printf "%.1f" }}${{ . }}{{ end }}
+            - **{{ .Value | humanizePercentage }} in C+D+liquidation**
+            - **{{ $amount }} {{ $asset }}**
+            - {{- with printf "sum (aave_bot_collaterals_values{pair=%q,bin=%q,zone=~'C|D|liquidation'})" .Labels.pair
+              .Labels.bin | query | first | value | printf "%.1f" }}{{ if ne $asset "stETH" }} **${{ . }}**{{ end }}
+            {{- end }}
             {{ with
               printf "aave_bot_collaterals:percent{pair=%q,bin=%q,zone=~'C|D|liquidation'}" .Labels.pair .Labels.bin |
               query | sortByLabel "zone" }}{{ range .
@@ -95,9 +96,10 @@ groups:
             - {{ .Value | humanizePercentage }} in {{ .Labels.zone }}
             - {{ with printf "aave_bot_collaterals{pair=%q,bin=%q,zone=%q}" .Labels.pair .Labels.bin .Labels.zone |
             query }}{{ $v := . | first | value | printf "%.1f" }}{{ $v }} {{ $asset }}{{ end }}
-            - {{ with printf "aave_bot_collaterals_values{pair=%q,bin=%q,zone=%q}" .Labels.pair .Labels.bin
-              .Labels.zone | query | first | value | printf "%.1f" }}${{ . }}{{ end }}
-            {{ end }}{{ end }}
+            - {{- with printf "aave_bot_collaterals_values{pair=%q,bin=%q,zone=%q}" 
+              .Labels.pair .Labels.bin .Labels.zone | query | first | value | printf "%.1f" }}{{ if ne $asset "stETH" 
+              }} ${{ . }}{{ end }}
+            {{ end }}{{ end }}{{ end }}
 
       - alert: AAVEHighAmountCollateralsUnderRisk
         expr: >
