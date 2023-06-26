@@ -41,9 +41,9 @@ services:
     restart: unless-stopped
 
   discord_bot:
-    image: chtotonetak/alertmanager-discord:1.1.0
-    environment:
-      DISCORD_WEBHOOK:
+    image: lidofinance/alertmanager-discord:2.6.0
+    volumes:
+      - ./alertmanager-discord:/etc/alertmanager-discord
     restart: unless-stopped
 
 volumes:
