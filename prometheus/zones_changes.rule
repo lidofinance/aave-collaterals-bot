@@ -103,7 +103,7 @@ groups:
 
       - alert: AAVEHighAmountCollateralsUnderRisk
         expr: >
-          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"wstETH.+",zone="D"} >= 0.10 and on (pair,bin,zone)
+          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"wstETH.+",zone="D"} >= 0.05 and on (pair,bin,zone)
           aave_bot_collaterals >= 100
         for: 30m
         labels:
@@ -115,7 +115,7 @@ groups:
 
       - alert: AAVEHighAmountCollateralsUnderRisk
         expr: >
-          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"stMATIC.+",zone="D"} >= 0.10 and on (pair,bin,zone)
+          aave_bot_collaterals:percent{bin=~"2|3|4",pair=~"stMATIC.+",zone="D"} >= 0.05 and on (pair,bin,zone)
           aave_bot_collaterals >= 18000
         for: 30m
         labels:
