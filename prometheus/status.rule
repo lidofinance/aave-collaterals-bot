@@ -4,7 +4,7 @@ groups:
     rules:
 
       - alert: ProcessRestarted
-        expr: changes(process_start_time_seconds{job="collaterals"}[15m]) >= 3
+        expr: changes(process_start_time_seconds{job=~"collaterals|arbitrum|polygon"}[15m]) >= 3
         labels:
           severity: critical
         annotations:
