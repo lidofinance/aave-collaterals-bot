@@ -2,7 +2,7 @@
 version: "3"
 
 services:
-  bot:
+  bot-collaterals:
     build:
       context: .
     command: "main.py"
@@ -26,7 +26,7 @@ services:
       - 3000:3000
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.43.1
     ports:
       - 9090:9090
     volumes:

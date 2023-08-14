@@ -1,0 +1,8 @@
+scrape_configs:
+  - job_name: "arbitrum"
+    static_configs:
+      - targets: ["bot-arbitrum:8080"]
+        labels:
+          service: 'aave-arbitrum-bot'
+          source: 'aave-arbitrum-bot'
+          env: 'prod'

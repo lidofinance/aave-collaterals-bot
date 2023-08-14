@@ -17,15 +17,7 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  - job_name: "collaterals"
-    static_configs:
-      - targets: ["bot:8080"]
-
-    # make status dashboard reusable
-    relabel_configs:
-      - target_label: source
-        replacement: local
-      - target_label: env
-        replacement: local
-
-# vim: set ts=2 sw=2:
+scrape_config_files:
+  - scrape_config/collaterals.yml
+#  - scrape_config/arbitrum.yml
+#  - scrape_config/polygon.yml
