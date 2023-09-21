@@ -6,7 +6,7 @@ tests:
   # ProcessRestarted
   - interval: 5m
     input_series:
-      - series: process_start_time_seconds{job=~"mainnet|arbitrum|polygon"}
+      - series: process_start_time_seconds{job="mainnet"}
         values: 0 1 2 3 4 5
     alert_rule_test:
       # event should fire
@@ -15,17 +15,17 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              job: mainnet, arbitrum, polygon
+              job: mainnet
             exp_annotations:
-              summary: Too much AAVE {{ .job }} bot restarts
+              summary: Too much AAVE mainnet bot restarts
               description: >-
-                The AAVE {{ .job }} bot has been restarted for 3 times
+                The AAVE mainnet bot has been restarted for 3 times
                 for the last 15 minutes
 
   # StaleBotReport
   - interval: 5m
     input_series:
-      - series: aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"}
+      - series: aave_bot_processing_finished_seconds{job="mainnet"}
         values: _x8 900+0x37
     alert_rule_test:
       - eval_time: 35m
@@ -34,18 +34,19 @@ tests:
           - exp_labels:
               severity: high
             exp_annotations:
-              summary: Stale AAVE {{ .job }} bot report detected
+              summary: Stale AAVE (mainnet|arbitrum|polygon) bot report detected
               description: >-
                 No report has been received in the last 30
-                minutes since the AAVE {{ .job }} bot was launched
+                minutes since the AAVE (mainnet|arbitrum|polygon) bot was launched
 
       - eval_time: 3h40m
         alertname: StaleBotReport
         exp_alerts:
           - exp_labels:
               severity: high
+              job: mainnet
             exp_annotations:
-              summary: Stale AAVE {{ .job }} bot report detected
-              description: Last report has been received more than 3 hours ago on AAVE {{ .job }} bot
+              summary: Stale AAVE mainnet bot report detected
+              description: Last report has been received more than 3 hours ago on AAVE mainnet bot
 
 # vim: set ts=2 sw=2 ft=yaml:

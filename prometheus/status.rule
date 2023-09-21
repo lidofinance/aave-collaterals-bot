@@ -8,9 +8,9 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: Too much AAVE {{ .job }} bot restarts
+          summary: Too much AAVE {{ $labels.job }} bot restarts
           description: >-
-            The AAVE {{ .job }} bot has been restarted for {{ $value }} times
+            The AAVE {{ $labels.job }} bot has been restarted for {{ $value }} times
             for the last 15 minutes
 
       - alert: StaleBotReport  # 3 hours because of long intervals
@@ -20,21 +20,22 @@ groups:
         labels:
           severity: high
         annotations:
-          summary: Stale AAVE {{ .job }} bot report detected
+          summary: Stale AAVE {{ $labels.job }} bot report detected
           description: >-
-            Last report has been received more than 3 hours ago
+            Last report has been received more than 3 hours ago on AAVE {{ $labels.job }} bot
 
       - alert: StaleBotReportOnLaunch
         expr: >
           aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"} == 0 or
-          absent(aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"})
+          absent(aave_bot_processing_finished_seconds{job=~"mainnet"})
+
         for: 30m
         labels:
           severity: high
         annotations:
-          summary: Stale AAVE {{ .job }} bot report detected
+          summary: Stale AAVE (mainnet|arbitrum|polygon) bot report detected
           description: >-
             No report has been received in the last 30
-            minutes since the AAVE AAVE {{ .job }} bot was launched
+            minutes since the AAVE (mainnet|arbitrum|polygon) bot was launched
 
 # vim: set ts=2 sw=2 ft=yaml:
