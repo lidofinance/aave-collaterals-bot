@@ -18,6 +18,6 @@ scrape_configs:
       - targets: ["localhost:9090"]
 
 scrape_config_files:
-  - scrape_config/collaterals.yml
+  - scrape_config/mainnet.yml
 #  - scrape_config/arbitrum.yml
 #  - scrape_config/polygon.yml

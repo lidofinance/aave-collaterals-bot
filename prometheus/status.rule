@@ -4,37 +4,37 @@ groups:
     rules:
 
       - alert: ProcessRestarted
-        expr: changes(process_start_time_seconds{job=~"collaterals|arbitrum|polygon"}[15m]) >= 3
+        expr: changes(process_start_time_seconds{job=~"mainnet|arbitrum|polygon"}[15m]) >= 3
         labels:
           severity: critical
         annotations:
-          summary: Too much AAVE bot restarts
+          summary: Too much AAVE {{ .job }} bot restarts
           description: >-
-            The AAVE bot has been restarted for {{ $value }} times
+            The AAVE {{ .job }} bot has been restarted for {{ $value }} times
             for the last 15 minutes
 
       - alert: StaleBotReport  # 3 hours because of long intervals
         expr: >
-          time() - aave_bot_processing_finished_seconds > 3600 * 3 and
-          aave_bot_processing_finished_seconds > 0
+          time() - aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"} > 3600 * 3 and
+          aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"} > 0
         labels:
           severity: high
         annotations:
-          summary: Stale bot report detected
+          summary: Stale AAVE {{ .job }} bot report detected
           description: >-
             Last report has been received more than 3 hours ago
 
       - alert: StaleBotReportOnLaunch
         expr: >
-          aave_bot_processing_finished_seconds == 0 or
-          absent(aave_bot_processing_finished_seconds)
+          aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"} == 0 or
+          absent(aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"})
         for: 30m
         labels:
           severity: high
         annotations:
-          summary: Stale bot report detected
+          summary: Stale AAVE {{ .job }} bot report detected
           description: >-
             No report has been received in the last 30
-            minutes since the bot was launched
+            minutes since the AAVE AAVE {{ .job }} bot was launched
 
 # vim: set ts=2 sw=2 ft=yaml:

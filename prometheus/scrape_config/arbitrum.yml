@@ -3,6 +3,6 @@ scrape_configs:
     static_configs:
       - targets: ["bot-arbitrum:8080"]
         labels:
-          service: 'aave-arbitrum-bot'
-          source: 'aave-arbitrum-bot'
-          env: 'prod'
+          service: "aave-arbitrum-bot"
+          source: "aave-arbitrum-bot"
+          env: "prod"

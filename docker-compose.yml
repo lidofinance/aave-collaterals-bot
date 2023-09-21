@@ -2,7 +2,7 @@
 version: "3"
 
 services:
-  bot-collaterals:
+  bot-mainnet:
     build:
       context: .
     command: "main.py"

@@ -3,6 +3,6 @@ scrape_configs:
     static_configs:
       - targets: ["bot-polygon:8080"]
         labels:
-          service: 'aave-polygon-bot'
-          source: 'aave-polygon-bot'
-          env: 'prod'
+          service: "aave-polygon-bot"
+          source: "aave-polygon-bot"
+          env: "prod"
