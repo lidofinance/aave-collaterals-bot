@@ -29,15 +29,16 @@ tests:
         values: _x8 900+0x37
     alert_rule_test:
       - eval_time: 35m
-        alertname: StaleBotReportOnLaunch
+        alertname: StaleBotReportOnLaunchMainnet
         exp_alerts:
           - exp_labels:
               severity: high
+              job: mainnet
             exp_annotations:
-              summary: Stale AAVE (mainnet|arbitrum|polygon) bot report detected
+              summary: Stale AAVE mainnet bot report detected
               description: >-
                 No report has been received in the last 30
-                minutes since the AAVE (mainnet|arbitrum|polygon) bot was launched
+                minutes since the AAVE mainnet bot was launched
 
       - eval_time: 3h40m
         alertname: StaleBotReport
