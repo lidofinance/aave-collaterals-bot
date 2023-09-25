@@ -29,7 +29,7 @@ tests:
         values: _x8 900+0x37
     alert_rule_test:
       - eval_time: 35m
-        alertname: StaleBotReportOnLaunchMainnet
+        alertname: StaleBotReportOnLaunch
         exp_alerts:
           - exp_labels:
               severity: high
@@ -39,6 +39,22 @@ tests:
               description: >-
                 No report has been received in the last 30
                 minutes since the AAVE mainnet bot was launched
+          - exp_labels:
+              severity: high
+              job: arbitrum
+            exp_annotations:
+              summary: Stale AAVE arbitrum bot report detected
+              description: >-
+                No report has been received in the last 30
+                minutes since the AAVE arbitrum bot was launched
+          - exp_labels:
+              severity: high
+              job: polygon
+            exp_annotations:
+              summary: Stale AAVE polygon bot report detected
+              description: >-
+                No report has been received in the last 30
+                minutes since the AAVE polygon bot was launched
 
       - eval_time: 3h40m
         alertname: StaleBotReport

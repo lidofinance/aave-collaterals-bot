@@ -24,39 +24,12 @@ groups:
           description: >-
             Last report has been received more than 3 hours ago on AAVE {{ $labels.job }} bot
 
-      - alert: StaleBotReportOnLaunchMainnet
+      - alert: StaleBotReportOnLaunch
         expr: >
-          aave_bot_processing_finished_seconds{job="mainnet"} == 0 or
-          absent(aave_bot_processing_finished_seconds{job="mainnet"})
-
-        for: 30m
-        labels:
-          severity: high
-        annotations:
-          summary: Stale AAVE {{ $labels.job }} bot report detected
-          description: >-
-            No report has been received in the last 30
-            minutes since the AAVE {{ $labels.job }} bot was launched
-
-      - alert: StaleBotReportOnLaunchArbitrum
-        expr: >
-          aave_bot_processing_finished_seconds{job="arbitrum"} == 0 or
-          absent(aave_bot_processing_finished_seconds{job="arbitrum"})
-
-        for: 30m
-        labels:
-          severity: high
-        annotations:
-          summary: Stale AAVE {{ $labels.job }} bot report detected
-          description: >-
-            No report has been received in the last 30
-            minutes since the AAVE {{ $labels.job }} bot was launched
-
-      - alert: StaleBotReportOnLaunchPolygon
-        expr: >
-          aave_bot_processing_finished_seconds{job="polygon"} == 0 or
+          aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"} == 0 or
+          absent(aave_bot_processing_finished_seconds{job="mainnet"}) or
+          absent(aave_bot_processing_finished_seconds{job="arbitrum"}) or
           absent(aave_bot_processing_finished_seconds{job="polygon"})
-
         for: 30m
         labels:
           severity: high

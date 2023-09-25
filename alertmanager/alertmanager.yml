@@ -5,6 +5,11 @@ route:
   group_interval: 6h
   repeat_interval: 11h
   receiver: "discord"
+  routes:
+    - matchers:
+        - alertname=~"ProcessRestarted, StaleBotReport.+"
+      group_by: ["alertname", "job"]
+      receiver: "discord"
 
 receivers:
   - name: "discord"
