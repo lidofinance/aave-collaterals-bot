@@ -27,9 +27,10 @@ groups:
       - alert: StaleBotReportOnLaunch
         expr: >
           aave_bot_processing_finished_seconds{job=~"mainnet|arbitrum|polygon"} == 0 or
-          absent(aave_bot_processing_finished_seconds{job="mainnet"}) or
           absent(aave_bot_processing_finished_seconds{job="arbitrum"}) or
+          absent(aave_bot_processing_finished_seconds{job="mainnet"}) or
           absent(aave_bot_processing_finished_seconds{job="polygon"})
+
         for: 30m
         labels:
           severity: high
