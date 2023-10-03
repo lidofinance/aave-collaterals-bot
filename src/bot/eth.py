@@ -13,7 +13,7 @@ from .middleware import construct_fallback_provider_middleware, metrics_collecto
 log = logging.getLogger(__name__)
 
 
-w3 = Web3(HTTPProvider(NODE_ENDPOINT))
+w3 = Web3(HTTPProvider(NODE_ENDPOINT, request_kwargs={"timeout": 90}))
 w3.middleware_onion.add(metrics_collector)
 w3.middleware_onion.add(retryable)
 if FALLBACK_NODE_ENDPOINT:
