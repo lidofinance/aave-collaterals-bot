@@ -28,16 +28,15 @@ jobs:
 
       - name: Install prometheus
         run: |
-          sudo apt update &&
-          sudo apt install -y prometheus
-
+          wget https://github.com/prometheus/prometheus/releases/download/v2.47.1/prometheus-2.47.1.linux-amd64.tar.gz
+          tar -xf prometheus-2.47.1.linux-amd64.tar.gz
       - name: Run configuration check
-        run: promtool check config prometheus/prometheus.yml
+        run: ./prometheus-2.47.1.linux-amd64/promtool check config prometheus/prometheus.yml
 
       - name: Run rules check
-        run: promtool check rules prometheus/*.rule
+        run: ./prometheus-2.47.1.linux-amd64/promtool check rules prometheus/*.rule
         if: ${{ always() }}
 
       - name: Run rules tests
-        run: promtool test rules prometheus/*.test
+        run: ./prometheus-2.47.1.linux-amd64/promtool test rules prometheus/*.test
         if: ${{ always() }}
