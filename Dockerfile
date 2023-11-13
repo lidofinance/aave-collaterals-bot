@@ -3,7 +3,7 @@ FROM python:3.10.8-slim-bullseye as base
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y curl=7.74.0-1.3+deb11u9 tini=0.19.0-1 && \
+    apt-get install --no-install-recommends -y curl=7.74.0-1.3+deb11u10 tini=0.19.0-1 && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
